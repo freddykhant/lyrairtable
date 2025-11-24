@@ -152,10 +152,6 @@ export const users = createTable("user", (d) => ({
   image: d.varchar({ length: 255 }),
 }));
 
-export const usersRelations = relations(users, ({ many }) => ({
-  accounts: many(accounts),
-}));
-
 export const accounts = createTable(
   "account",
   (d) => ({
@@ -210,3 +206,34 @@ export const verificationTokens = createTable(
   }),
   (t) => [primaryKey({ columns: [t.identifier, t.token] })],
 );
+
+// relations
+
+export const usersRelations = relations(users, ({ many }) => ({
+  accounts: many(accounts),
+  bases: many(bases),
+}));
+
+export const baseRelations = relations(bases, ({ one, many }) => ({
+  user: one(users, { fields: [bases.userId], references: [users.id] }),
+  tables: many(tables),
+}));
+
+export const tableRelations = relations(tables, ({ one, many }) => ({
+  base: one(bases, { fields: [tables.baseId], references: [bases.id] }),
+  columns: many(columns),
+  rows: many(rows),
+  views: many(views),
+}));
+
+export const columnRelations = relations(columns, ({ one }) => ({
+  table: one(tables, { fields: [columns.tableId], references: [tables.id] }),
+}));
+
+export const rowRelations = relations(rows, ({ one }) => ({
+  table: one(tables, { fields: [rows.tableId], references: [tables.id] }),
+}));
+
+export const viewRelations = relations(views, ({ one }) => ({
+  table: one(tables, { fields: [views.tableId], references: [tables.id] }),
+}));
