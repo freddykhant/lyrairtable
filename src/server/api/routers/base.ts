@@ -10,14 +10,6 @@ import { bases } from "~/server/db/schema";
 import { create } from "domain";
 
 export const baseRouter = createTRPCRouter({
-  hello: publicProcedure
-    .input(z.object({ text: z.string() }))
-    .query(({ input }) => {
-      return {
-        greeting: `Hello ${input.text}`,
-      };
-    }),
-
   // create new base
   create: protectedProcedure
     .input(z.object({ name: z.string().min(1) }))
