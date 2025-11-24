@@ -1,16 +1,83 @@
 import { faker } from "@faker-js/faker";
-import { db } from "./index";
-import { bases, tables, columns, rows, users } from "./schema";
+import { drizzle } from "drizzle-orm/neon-http";
+import { neon } from "@neondatabase/serverless";
+import { config } from "dotenv";
+import { pgTableCreator } from "drizzle-orm/pg-core";
 
-/**
- * Seed script for generating sample data
- *
- * Usage:
- * 1. Set your user ID below (get it from your database after logging in)
- * 2. Run: npx tsx src/server/db/seed.ts
- */
+config({ path: ".env" });
 
-const SAMPLE_USER_ID = "your-user-id-here"; // Replace with actual user ID from your database
+// Recreate just the tables we need for seeding
+const createTable = pgTableCreator((name) => `lyrairtable_${name}`);
+
+const users = createTable("user", (d) => ({
+  id: d.varchar({ length: 255 }).notNull().primaryKey(),
+  name: d.varchar({ length: 255 }),
+  email: d.varchar({ length: 255 }).notNull(),
+}));
+
+const bases = createTable("base", (d) => ({
+  id: d
+    .varchar({ length: 255 })
+    .notNull()
+    .primaryKey()
+    .$defaultFn(() => crypto.randomUUID()),
+  name: d.varchar({ length: 255 }).notNull(),
+  userId: d.varchar({ length: 255 }).notNull(),
+  createdAt: d
+    .timestamp({ withTimezone: true })
+    .$defaultFn(() => new Date())
+    .notNull(),
+}));
+
+const tables = createTable("table", (d) => ({
+  id: d
+    .varchar({ length: 255 })
+    .notNull()
+    .primaryKey()
+    .$defaultFn(() => crypto.randomUUID()),
+  name: d.varchar({ length: 255 }).notNull(),
+  baseId: d.varchar({ length: 255 }).notNull(),
+  order: d.integer().notNull().default(0),
+  createdAt: d
+    .timestamp({ withTimezone: true })
+    .$defaultFn(() => new Date())
+    .notNull(),
+}));
+
+const columns = createTable("column", (d) => ({
+  id: d
+    .varchar({ length: 255 })
+    .notNull()
+    .primaryKey()
+    .$defaultFn(() => crypto.randomUUID()),
+  name: d.varchar({ length: 255 }).notNull(),
+  tableId: d.varchar({ length: 255 }).notNull(),
+  type: d.varchar({ length: 50 }).notNull(),
+  order: d.integer().notNull().default(0),
+  createdAt: d
+    .timestamp({ withTimezone: true })
+    .$defaultFn(() => new Date())
+    .notNull(),
+}));
+
+const rows = createTable("row", (d) => ({
+  id: d
+    .varchar({ length: 255 })
+    .notNull()
+    .primaryKey()
+    .$defaultFn(() => crypto.randomUUID()),
+  tableId: d.varchar({ length: 255 }).notNull(),
+  data: d.jsonb().notNull(),
+  order: d.integer().notNull().default(0),
+  createdAt: d
+    .timestamp({ withTimezone: true })
+    .$defaultFn(() => new Date())
+    .notNull(),
+}));
+
+const sql = neon(process.env.STORAGE_POSTGRES_URL!);
+const db = drizzle({ client: sql });
+
 const NUM_BASES = 3;
 const NUM_TABLES_PER_BASE = 3;
 const NUM_ROWS_PER_TABLE = 100; // Adjust up to 100k for performance testing
