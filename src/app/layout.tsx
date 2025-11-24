@@ -4,7 +4,6 @@ import { type Metadata } from "next";
 import { Geist } from "next/font/google";
 
 import { TRPCReactProvider } from "~/trpc/react";
-import Header from "./_components/header";
 
 export const metadata: Metadata = {
   title: "Lyra Airtable Clone",
@@ -23,7 +22,6 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${geist.variable}`}>
       <body>
-        <Header />
         <TRPCReactProvider>{children}</TRPCReactProvider>
       </body>
     </html>
