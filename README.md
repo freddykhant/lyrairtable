@@ -1,29 +1,37 @@
-# Create T3 App
+# lyrairtable clone
 
-This is a [T3 Stack](https://create.t3.gg/) project bootstrapped with `create-t3-app`.
+building lyra airtable clone as part of my take home assessment with lyra
 
-## What's next? How do I make an app with this?
+## req
 
-We try to keep this project as simple as possible, so you can start with just the scaffolding we set up for you, and add additional things later when they become necessary.
+- 1:1 UI with airtable
+- able to log in via google and create bases
+- in each base, able to create tables
+- able to dynamically add columns
+- text and number (fine for now)
+- editing cells, navigable with arrow keys + tab key
+- creating table will show default rows + columns
+- ability to see table iwth 100k rows and scroll **WITHOUT LAG**
+  - button to add 100k rows to table
+  - virtualised infinite scroll using tRPC's hooks + tanstack virtualiser
+- ability to search across all cells (filter for rows)
+- able to create a 'view' of a table and save following configurations:
+  - filter columns: for both numbers (greater than, smaller than) adn text (not empty, is empty, contains, not contains, equal to)
+  - simple sorting on columns: text A->Z, Z->A
+  - for numbers, decreasing or increasing
+  - search, filter, sort have to be done on db level
+  - can search through and hide/show columns
+- make sure theres a loading state
+- ultimate goal: if there are **1m rows**, can still **load without issue**!
 
-If you are not familiar with the different technologies used in this project, please refer to the respective docs. If you still are in the wind, please join our [Discord](https://t3.gg/discord) and ask for help.
+## tech stack
 
-- [Next.js](https://nextjs.org)
-- [NextAuth.js](https://next-auth.js.org)
-- [Prisma](https://prisma.io)
-- [Drizzle](https://orm.drizzle.team)
-- [Tailwind CSS](https://tailwindcss.com)
-- [tRPC](https://trpc.io)
+t3 stack
 
-## Learn More
-
-To learn more about the [T3 Stack](https://create.t3.gg/), take a look at the following resources:
-
-- [Documentation](https://create.t3.gg/)
-- [Learn the T3 Stack](https://create.t3.gg/en/faq#what-learning-resources-are-currently-available) — Check out these awesome tutorials
-
-You can check out the [create-t3-app GitHub repository](https://github.com/t3-oss/create-t3-app) — your feedback and contributions are welcome!
-
-## How do I deploy this?
-
-Follow our deployment guides for [Vercel](https://create.t3.gg/en/deployment/vercel), [Netlify](https://create.t3.gg/en/deployment/netlify) and [Docker](https://create.t3.gg/en/deployment/docker) for more information.
+- next app router
+- tailwind
+- trpc
+- drizzle
+- postgres neon
+- tanstack
+- fakerjs
