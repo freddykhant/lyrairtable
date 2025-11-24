@@ -2,12 +2,19 @@
 
 import { Search, Bell, HelpCircle, Menu } from "lucide-react";
 import Image from "next/image";
+import { UserButton } from "./user-button";
 
 interface HeaderProps {
   onMenuClick?: () => void;
+  user?: {
+    name?: string | null;
+    email?: string | null;
+    image?: string | null;
+  } | null;
+  onSignOut?: () => void;
 }
 
-export function Header({ onMenuClick }: HeaderProps) {
+export function Header({ onMenuClick, user, onSignOut }: HeaderProps) {
   return (
     <header className="g-background flex h-14 items-center justify-between border-b border-gray-300 px-4">
       {/* left section */}
@@ -52,10 +59,13 @@ export function Header({ onMenuClick }: HeaderProps) {
         <button className="hover:bg-secondary text-muted-foreground hover:text-foreground rounded p-1.5 transition-colors hover:cursor-pointer hover:bg-gray-200">
           <Bell size={20} />
         </button>
-        {/* profile button placeholder */}
-        <button className="flex h-8 w-8 items-center justify-center rounded-full bg-pink-500 text-sm font-bold text-white transition-opacity hover:cursor-pointer hover:opacity-80">
-          P
-        </button>
+        {user && onSignOut ? (
+          <UserButton user={user} onSignOut={onSignOut} />
+        ) : (
+          <button className="flex h-8 w-8 items-center justify-center rounded-full bg-gray-300 text-sm font-bold text-white">
+            ?
+          </button>
+        )}
       </div>
     </header>
   );
