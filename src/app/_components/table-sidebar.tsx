@@ -1,7 +1,19 @@
-export default function TableSidebar() {
+interface TableSidebarProps {
+  isOpen: boolean;
+}
+
+export default function TableSidebar({ isOpen }: TableSidebarProps) {
   return (
-    <div>
-      <h1>Table Sidebar</h1>
-    </div>
+    <aside
+      className={`border-r border-gray-200 bg-white transition-all ${
+        isOpen ? "w-64" : "w-0"
+      }`}
+    >
+      {isOpen && (
+        <div className="p-4">
+          <h1>Table Sidebar</h1>
+        </div>
+      )}
+    </aside>
   );
 }

@@ -1,10 +1,7 @@
 import { auth, signOut } from "~/server/auth";
-import { CollapsedSidebar } from "~/app/_components/collapsed-sidebar";
 import { api } from "~/trpc/server";
 import { redirect } from "next/navigation";
-import BaseHeader from "~/app/_components/base-header";
-import TableNav from "~/app/_components/table-nav";
-import TableSidebar from "~/app/_components/table-sidebar";
+import BaseClient from "../base-client";
 
 export default async function BasePage({
   params,
@@ -26,24 +23,6 @@ export default async function BasePage({
   }
 
   return (
-    <div className="flex h-screen flex-col">
-      <div className="flex flex-1">
-        <CollapsedSidebar user={session.user} onSignOut={handleSignOut} />
-        <main className="flex-1 bg-gray-50">
-          <BaseHeader baseName={base.name} />
-          <TableNav
-            tables={base.tables}
-            activeTableId={base?.tables[0]?.id ?? ""}
-            baseId={id}
-          />
-          <div className="flex flex-1">
-            <TableSidebar />
-            <main>
-              <div>table content here</div>
-            </main>
-          </div>
-        </main>
-      </div>
-    </div>
+    <BaseClient user={session.user} base={base} onSignOut={handleSignOut} />
   );
 }
