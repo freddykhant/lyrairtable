@@ -11,9 +11,14 @@ interface UserButtonProps {
     image?: string | null;
   };
   onSignOut: () => void;
+  position?: "left" | "right";
 }
 
-export function UserButton({ user, onSignOut }: UserButtonProps) {
+export function UserButton({
+  user,
+  onSignOut,
+  position = "right",
+}: UserButtonProps) {
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
@@ -65,14 +70,12 @@ export function UserButton({ user, onSignOut }: UserButtonProps) {
 
       {isOpen && (
         <div
-          className="absolute top-full right-0 z-50 mt-2 w-64 rounded-lg border bg-white shadow-lg"
-          style={{ borderColor: "rgba(0, 0, 0, 0.1)" }}
+          className={`absolute top-full z-[100] mt-2 w-64 rounded-lg border border-gray-300 bg-white shadow-lg ${
+            position === "right" ? "right-0" : "left-[calc(100%+0.5rem)]"
+          }`}
         >
           {/* User Info */}
-          <div
-            className="border-b px-4 py-3"
-            style={{ borderColor: "rgba(0, 0, 0, 0.06)" }}
-          >
+          <div className="border-b border-gray-300 px-4 py-3">
             <div className="flex items-center gap-3">
               <div className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-600 text-sm font-semibold text-white">
                 {user.image ? (
