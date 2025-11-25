@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { eq, and } from "drizzle-orm";
-import { bases, tables } from "~/server/db/schema";
+import { bases, tables, columns, rows } from "~/server/db/schema";
+import { faker } from "@faker-js/faker";
 
 import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
 
