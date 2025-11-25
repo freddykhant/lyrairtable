@@ -11,16 +11,19 @@ import {
   Globe,
 } from "lucide-react";
 
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+
 interface SidebarProps {
   isOpen: boolean;
 }
 
 export function Sidebar({ isOpen }: SidebarProps) {
   const navItems = [
-    { icon: Home, label: "Home", active: true },
+    { icon: Home, label: "Home", href: "/" },
     { icon: Star, label: "Starred" },
     { icon: Share2, label: "Shared" },
-    { icon: Users, label: "Bases" },
+    { icon: Users, label: "Bases", href: "/bases" },
   ];
 
   const bottomItems = [
@@ -33,36 +36,53 @@ export function Sidebar({ isOpen }: SidebarProps) {
     return null;
   }
 
+  const pathname = usePathname();
+
   return (
     <aside className="flex h-full w-64 flex-col border-r border-gray-300 bg-white">
-      {/* Main Navigation */}
+      {/* Empty */}
       <nav className="flex-1 space-y-1 overflow-y-auto p-3">
-        {navItems.map((item, idx) => (
-          <button
-            key={idx}
-            className={`flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm transition-colors ${
-              item.active
-                ? "bg-gray-100 font-medium text-gray-900"
-                : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
-            }`}
-          >
-            <item.icon size={20} className="flex-shrink-0" />
-            <span>{item.label}</span>
-          </button>
-        ))}
+        {navItems.map((item, idx) => {
+          const isActive = item.href === pathname;
+          const hasHref = !!item.href;
+
+          const button = (
+            <button
+              className={`flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm transition-colors ${
+                isActive
+                  ? "bg-gray-100 font-medium text-gray-900"
+                  : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+              }`}
+              disabled={!hasHref} // Disable if no href
+            >
+              <item.icon size={20} className="flex-shrink-0" />
+              <span>{item.label}</span>
+            </button>
+          );
+
+          return hasHref ? (
+            <Link href={item.href!} key={idx}>
+              {button}
+            </Link>
+          ) : (
+            <div key={idx}>{button}</div>
+          );
+        })}
 
         {/* Bases Section */}
         <div
           className="mt-4 border-t pt-4"
           style={{ borderColor: "rgba(0, 0, 0, 0.06)" }}
         >
-          <button className="flex w-full items-center justify-between gap-2 rounded-lg px-3 py-2 text-sm text-gray-600 transition-colors hover:bg-gray-50 hover:text-gray-900">
-            <div className="flex items-center gap-3">
-              <Users size={20} className="flex-shrink-0" />
-              <span>Bases</span>
-            </div>
-            <Plus size={16} className="text-gray-400" />
-          </button>
+          <Link href="/bases">
+            <button className="flex w-full items-center justify-between gap-2 rounded-lg px-3 py-2 text-sm text-gray-600 transition-colors hover:bg-gray-50 hover:text-gray-900">
+              <div className="flex items-center gap-3">
+                <Users size={20} className="flex-shrink-0" />
+                <span>Bases</span>
+              </div>
+              <Plus size={16} className="text-gray-400" />
+            </button>
+          </Link>
         </div>
       </nav>
 
