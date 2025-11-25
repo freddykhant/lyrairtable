@@ -1,8 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { Header } from "../_components/header";
-import { Sidebar } from "../_components/sidebar";
+import { Header } from "./_components/header";
+import { Sidebar } from "./_components/sidebar";
 import { api } from "~/trpc/react";
 
 interface DashboardClientProps {
