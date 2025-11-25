@@ -8,7 +8,7 @@ import { TRPCReactProvider } from "~/trpc/react";
 export const metadata: Metadata = {
   title: "lyrairtable",
   description: "lyra airtable clone built by freddy",
-  icons: [{ rel: "icon", url: "/favicon.svg" }],
+  icons: [{ rel: "icon", url: "/airtable.svg" }],
 };
 
 const geist = Geist({
