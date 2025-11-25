@@ -7,6 +7,7 @@ import TableNav from "../_components/table-nav";
 import { CollapsedSidebar } from "../_components/collapsed-sidebar";
 import type { tables, users } from "~/server/db/schema";
 import { useState } from "react";
+import Table from "../_components/table";
 
 interface BaseClientProps {
   user: {
@@ -42,8 +43,8 @@ export default function BaseClient({ user, base, onSignOut }: BaseClientProps) {
 
           <div className="flex flex-1 overflow-hidden">
             <TableSidebar isOpen={sidebarOpen} />
-            <div className="flex-1 overflow-auto bg-white p-4">
-              <div>table content here</div>
+            <div className="flex-1 overflow-auto bg-white p-4 text-sm">
+              <Table />
             </div>
           </div>
         </div>
