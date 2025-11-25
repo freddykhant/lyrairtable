@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { eq, and } from "drizzle-orm";
+import { eq, and, asc } from "drizzle-orm";
 import { bases, tables, columns, rows } from "~/server/db/schema";
 import { faker } from "@faker-js/faker";
 
@@ -108,6 +108,11 @@ export const tableRouter = createTRPCRouter({
 
       return await ctx.db.query.tables.findFirst({
         where: and(eq(tables.id, input.id), eq(tables.baseId, input.baseId)),
+        with: {
+          columns: {
+            orderBy: (columns, { asc }) => [asc(columns.order)],
+          },
+        },
       });
     }),
 });
