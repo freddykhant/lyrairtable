@@ -1,6 +1,6 @@
 import { auth, signOut } from "~/server/auth";
 import Hero from "./_components/hero";
-import DashboardClient from "./dashboard-client";
+import HomeClient from "./home-client";
 
 export default async function Home() {
   const session = await auth();
@@ -14,5 +14,5 @@ export default async function Home() {
     await signOut({ redirectTo: "/" });
   }
 
-  return <DashboardClient user={session.user} onSignOut={handleSignOut} />;
+  return <HomeClient user={session.user} onSignOut={handleSignOut} />;
 }

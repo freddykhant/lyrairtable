@@ -5,7 +5,7 @@ import { Header } from "./_components/header";
 import { Sidebar } from "./_components/sidebar";
 import { api } from "~/trpc/react";
 
-interface DashboardClientProps {
+interface HomeClientProps {
   user: {
     name?: string | null;
     email?: string | null;
@@ -14,10 +14,7 @@ interface DashboardClientProps {
   onSignOut: () => void;
 }
 
-export default function DashboardClient({
-  user,
-  onSignOut,
-}: DashboardClientProps) {
+export default function HomeClient({ user, onSignOut }: HomeClientProps) {
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const { data: bases, isLoading } = api.base.getAll.useQuery();
 
