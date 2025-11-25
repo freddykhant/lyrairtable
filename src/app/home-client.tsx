@@ -29,7 +29,7 @@ export default function HomeClient({ user, onSignOut }: HomeClientProps) {
         <Sidebar isOpen={sidebarOpen} />
         <main className="flex-1 overflow-auto bg-gray-50 p-8">
           <h1 className="mb-6 text-2xl font-semibold text-gray-900">
-            My Bases
+            All Bases
           </h1>
         </main>
       </div>

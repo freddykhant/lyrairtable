@@ -20,7 +20,7 @@ export function Sidebar({ isOpen }: SidebarProps) {
     { icon: Home, label: "Home", active: true },
     { icon: Star, label: "Starred" },
     { icon: Share2, label: "Shared" },
-    { icon: Users, label: "Workspaces" },
+    { icon: Users, label: "Bases" },
   ];
 
   const bottomItems = [
@@ -51,7 +51,7 @@ export function Sidebar({ isOpen }: SidebarProps) {
           </button>
         ))}
 
-        {/* Workspaces Section */}
+        {/* Bases Section */}
         <div
           className="mt-4 border-t pt-4"
           style={{ borderColor: "rgba(0, 0, 0, 0.06)" }}
@@ -59,7 +59,7 @@ export function Sidebar({ isOpen }: SidebarProps) {
           <button className="flex w-full items-center justify-between gap-2 rounded-lg px-3 py-2 text-sm text-gray-600 transition-colors hover:bg-gray-50 hover:text-gray-900">
             <div className="flex items-center gap-3">
               <Users size={20} className="flex-shrink-0" />
-              <span>Workspaces</span>
+              <span>Bases</span>
             </div>
             <Plus size={16} className="text-gray-400" />
           </button>
