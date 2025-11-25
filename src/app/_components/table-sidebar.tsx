@@ -5,7 +5,7 @@ interface TableSidebarProps {
 export default function TableSidebar({ isOpen }: TableSidebarProps) {
   return (
     <aside
-      className={`border-r border-gray-200 bg-white transition-all ${
+      className={`border-r border-gray-200 bg-white text-sm transition-all ${
         isOpen ? "w-64" : "w-0"
       }`}
     >
