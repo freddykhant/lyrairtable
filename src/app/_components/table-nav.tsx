@@ -29,12 +29,12 @@ export default function TableNav({
   };
 
   return (
-    <nav className="flex items-center justify-between border-b border-gray-200 bg-gray-50 px-4 py-2">
+    <nav className="flex items-center justify-between border-b border-gray-200 bg-gray-50 px-4 py-2 text-sm">
       <div className="flex items-center gap-2">
         {tables.map((table) => (
           <button
             key={table.id}
-            className={`flex items-center gap-2 rounded-md px-3 py-1.5 text-sm font-medium transition-colors ${
+            className={`flex items-center gap-2 rounded-lg px-3 py-1 transition-colors ${
               table.id === activeTableId
                 ? "bg-white text-gray-900" // active
                 : "text-gray-600 hover:bg-gray-100" // inactive
@@ -45,7 +45,7 @@ export default function TableNav({
           </button>
         ))}
         <button
-          className="flex items-center gap-2 rounded-md px-3 py-1.5 text-sm font-medium text-gray-600 hover:bg-gray-100"
+          className="flex items-center gap-2 rounded-md px-3 py-1.5 font-medium text-gray-600 hover:bg-gray-100"
           onClick={() => handleAddTable()}
         >
           <Plus size={14} />
