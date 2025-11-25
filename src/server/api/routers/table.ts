@@ -32,6 +32,48 @@ export const tableRouter = createTRPCRouter({
           order: input.order ?? 0,
         })
         .returning();
+
+      if (!newTable) {
+        throw new Error("Failed to create table");
+      }
+
+      // define default columns
+      const defaultColumns = [
+        { name: "Name", type: "text", order: 0, tableId: newTable.id },
+        { name: "Status", type: "text", order: 1, tableId: newTable.id },
+        { name: "Notes", type: "text", order: 2, tableId: newTable.id },
+      ];
+
+      // insert columns
+      const createdColumns = await ctx.db
+        .insert(columns)
+        .values(defaultColumns)
+        .returning();
+
+      // create row data
+      const defaultRows = [];
+      for (let i = 0; i < 5; i++) {
+        const rowData = {
+          [createdColumns[0]!.id]: faker.person.fullName(), // name
+          [createdColumns[1]!.id]: faker.helpers.arrayElement([
+            "Not Started",
+            "In Progress",
+            "Done",
+          ]), // status
+          [createdColumns[2]!.id]: faker.lorem.sentence(), // notes
+        };
+
+        // insert row data
+        defaultRows.push({
+          tableId: newTable.id,
+          data: rowData,
+          order: i,
+        });
+      }
+
+      // insert rows into table
+      await ctx.db.insert(rows).values(defaultRows);
+
       return newTable;
     }),
 
