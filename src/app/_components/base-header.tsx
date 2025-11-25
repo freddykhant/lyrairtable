@@ -24,7 +24,7 @@ export default function BaseHeader({ baseName }: BaseHeaderProps) {
       </div>
       {/* center section */}
       <nav className="flex items-center gap-6">
-        <button className="border-b-2 border-blue-600 pb-2 font-medium text-gray-900 hover:cursor-pointer hover:border-blue-600">
+        <button className="hover:cursor-pointe text-sm font-medium text-gray-800">
           Data
         </button>
       </nav>
