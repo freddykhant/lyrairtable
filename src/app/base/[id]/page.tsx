@@ -2,6 +2,7 @@ import { auth, signOut } from "~/server/auth";
 import { CollapsedSidebar } from "~/app/_components/collapsed-sidebar";
 import { api } from "~/trpc/server";
 import { redirect } from "next/navigation";
+import BaseHeader from "~/app/_components/base-header";
 
 export default async function BasePage({
   params,
@@ -27,6 +28,7 @@ export default async function BasePage({
       <div className="flex flex-1">
         <CollapsedSidebar user={session.user} onSignOut={handleSignOut} />
         <main className="flex-1 bg-gray-50">
+          <BaseHeader baseName={base.name} />
           <div className="p-8">
             <h1 className="text-2xl font-semibold text-gray-900">
               {base.name}

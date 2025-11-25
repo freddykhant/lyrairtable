@@ -17,8 +17,13 @@ export function CollapsedSidebar({ user, onSignOut }: CollapsedSidebarProps) {
     <div className="flex h-full w-16 flex-col items-center border-r border-gray-300 bg-white p-3">
       {/* Top: Logo */}
       <Link href="/">
-        <div className="mb-4 hover:cursor-pointer">
-          <Image src="/airtable.svg" alt="airtable" width={24} height={24} />
+        <div className="mb-4 py-2 hover:cursor-pointer">
+          <Image
+            src="/airtable-mark-black.png"
+            alt="airtable"
+            width={21}
+            height={21}
+          />
         </div>
       </Link>
 
