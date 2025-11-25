@@ -1,13 +1,8 @@
 import { z } from "zod";
 import { eq, desc } from "drizzle-orm";
 
-import {
-  createTRPCRouter,
-  protectedProcedure,
-  publicProcedure,
-} from "~/server/api/trpc";
+import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
 import { bases } from "~/server/db/schema";
-import { create } from "domain";
 
 export const baseRouter = createTRPCRouter({
   // create new base
