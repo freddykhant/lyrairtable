@@ -34,6 +34,9 @@ export const baseRouter = createTRPCRouter({
     .query(async ({ ctx, input }) => {
       const base = await ctx.db.query.bases.findFirst({
         where: eq(bases.id, input.id),
+        with: {
+          tables: true,
+        },
       });
 
       if (!base || base.userId !== ctx.session.user.id) {
