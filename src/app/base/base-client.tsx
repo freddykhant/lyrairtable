@@ -8,6 +8,7 @@ import { CollapsedSidebar } from "../_components/collapsed-sidebar";
 import type { tables, users } from "~/server/db/schema";
 import { useState } from "react";
 import Table from "../_components/table";
+import { api } from "~/trpc/react";
 
 interface BaseClientProps {
   user: {
@@ -25,6 +26,19 @@ interface BaseClientProps {
 
 export default function BaseClient({ user, base, onSignOut }: BaseClientProps) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [activeTableId, setActiveTableId] = useState(base.tables[0]?.id ?? "");
+
+  const { data: tableData, isLoading: tableLoading } =
+    api.table.getById.useQuery(
+      { id: activeTableId, baseId: base.id },
+      { enabled: !!activeTableId && !!base.id },
+    );
+
+  const { data: rowsData, isLoading: rowsLoading } =
+    api.row.getByTableId.useQuery(
+      { tableId: activeTableId, limit: 50 },
+      { enabled: !!activeTableId },
+    );
 
   return (
     <div className="flex h-screen">
@@ -44,7 +58,11 @@ export default function BaseClient({ user, base, onSignOut }: BaseClientProps) {
           <div className="flex flex-1 overflow-hidden">
             <TableSidebar isOpen={sidebarOpen} />
             <div className="flex-1 overflow-auto bg-white p-4 text-sm">
-              <Table />
+              <Table
+                columns={tableData?.columns ?? []}
+                rows={rowsData ?? []}
+                isLoading={tableLoading || rowsLoading}
+              />
             </div>
           </div>
         </div>
