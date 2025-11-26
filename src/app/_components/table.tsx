@@ -85,12 +85,17 @@ export default function Table({ columns, rows, isLoading }: TableProps) {
             </tr>
           ))}
         </tbody>
+        <tfoot>
+          <tr>
+            <td
+              colSpan={table.getAllColumns().length}
+              className="border-t border-gray-200 px-4 py-2 text-left text-xs font-medium text-gray-700"
+            >
+              {rows.length} records
+            </td>
+          </tr>
+        </tfoot>
       </table>
-
-      {/* footer for record count */}
-      <div className="border-t border-gray-200 p-2 text-xs text-gray-500">
-        {rows.length} records
-      </div>
     </div>
   );
 }
