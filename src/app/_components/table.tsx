@@ -43,6 +43,18 @@ export default function Table({
     },
   });
 
+  const createColumn = api.column.create.useMutation({
+    onSuccess: () => {
+      utils.table.getById.invalidate();
+    },
+  });
+
+  // const updateColumn = api.column.update.useMutation({
+  //   onSuccess: () => {
+  //     utils.table.getById.invalidate();
+  //   },
+  // });
+
   const tanstackColumns = useMemo(
     () =>
       columns.map((col) => ({
@@ -127,6 +139,15 @@ export default function Table({
     });
   };
 
+  const handleAddColumn = () => {
+    createColumn.mutate({
+      tableId: tableId,
+      name: "New Column",
+      type: "text",
+      order: columns.length,
+    });
+  };
+
   const handleCellClick = (
     rowId: string,
     columnId: string,
@@ -180,6 +201,14 @@ export default function Table({
                   )}
                 </th>
               ))}
+              <th className="border-b border-gray-200 px-4 py-2">
+                <button
+                  onClick={handleAddColumn}
+                  className="flex items-center gap-1 text-xs text-gray-600 hover:text-gray-900"
+                >
+                  <Plus size={14} />
+                </button>
+              </th>
             </tr>
           ))}
         </thead>

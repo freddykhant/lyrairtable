@@ -40,6 +40,27 @@ export const columnRouter = createTRPCRouter({
       return newColumn;
     }),
 
+  // get columns by tableId
+  getByTableId: protectedProcedure
+    .input(z.object({ tableId: z.string() }))
+    .query(async ({ ctx, input }) => {
+      const table = await ctx.db.query.tables.findFirst({
+        where: eq(tables.id, input.tableId),
+        with: {
+          base: true,
+        },
+      });
+
+      if (!table || table.base.userId !== ctx.session.user.id) {
+        throw new Error("Table not found");
+      }
+
+      return await ctx.db.query.columns.findMany({
+        where: eq(columns.tableId, input.tableId),
+        orderBy: (columns, { asc }) => [asc(columns.order)],
+      });
+    }),
+
   // update column
   update: protectedProcedure
     .input(
