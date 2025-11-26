@@ -4,6 +4,7 @@ import { bases, tables, columns, rows } from "~/server/db/schema";
 import { faker } from "@faker-js/faker";
 
 import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
+import { createTextSpan } from "typescript";
 
 export const tableRouter = createTRPCRouter({
   // create new table
@@ -114,5 +115,36 @@ export const tableRouter = createTRPCRouter({
           },
         },
       });
+    }),
+
+  // update table
+  update: protectedProcedure
+    .input(
+      z.object({
+        id: z.string(),
+        name: z.string().min(1),
+        order: z.number().optional(),
+        baseId: z.string(),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      const base = await ctx.db.query.bases.findFirst({
+        where: eq(bases.id, input.baseId),
+      });
+
+      if (!base || base.userId !== ctx.session.user.id) {
+        throw new Error("Base not found");
+      }
+
+      const [updatedTable] = await ctx.db
+        .update(tables)
+        .set({
+          name: input.name,
+          order: input.order ?? 0,
+        })
+        .where(eq(tables.id, input.id))
+        .returning();
+
+      return updatedTable;
     }),
 });
