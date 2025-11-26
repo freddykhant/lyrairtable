@@ -39,10 +39,10 @@ rows table
 ```
 users (nextauth)
 └── bases (workspace containers)
-└── tables (like sheets)
-├── columns (metadata: name, type, order)
-├── rows (data: jsonb object)
-└── views (saved filters/sorts - futuret" | "number")
+  └── tables (like sheets)
+    ├── columns (metadata: name, type, order)
+    ├── rows (data: jsonb object)
+    └── views (saved filters/sorts - futuret" | "number")
 ```
 
 - belongs to table
