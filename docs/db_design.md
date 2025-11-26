@@ -14,26 +14,36 @@ airtable lets users create columns on the fly. traditional sql = rigid schema. c
 
 ### example
 
-// columns table
+columns table
+
+```
 { id: "col-1", name: "Name", type: "text", tableId: "table-1" }
 { id: "col-2", name: "Status", type: "text", tableId: "table-1" }
+```
 
-// rows table
+rows table
+
+```
 { id: "row-1", tableId: "table-1", data: {
 "col-1": "Anna Stracke PhD",
 "col-2": "Done"
-}}**magic:** add a column = insert metadata. no schema change needed. existing rows keep working.
+}}
+```
+
+**magic:** add a column = insert metadata. no schema change needed. existing rows keep working.
 
 ---
 
 ## entity structure
 
+```
 users (nextauth)
 └── bases (workspace containers)
 └── tables (like sheets)
 ├── columns (metadata: name, type, order)
 ├── rows (data: jsonb object)
 └── views (saved filters/sorts - futuret" | "number")
+```
 
 - belongs to table
 - cascade delete when table deleted
