@@ -9,12 +9,14 @@ interface TableNavProps {
   tables: (typeof tables.$inferSelect)[];
   activeTableId: string;
   baseId: string;
+  onTableChange: (tableId: string) => void;
 }
 
 export default function TableNav({
   tables,
   activeTableId,
   baseId,
+  onTableChange,
 }: TableNavProps) {
   const router = useRouter();
   const createTable = api.table.create.useMutation({
@@ -34,6 +36,7 @@ export default function TableNav({
         {tables.map((table) => (
           <button
             key={table.id}
+            onClick={() => onTableChange(table.id)}
             className={`flex items-center gap-2 rounded-lg px-3 py-1 transition-colors ${
               table.id === activeTableId
                 ? "bg-white text-gray-900" // active

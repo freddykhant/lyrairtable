@@ -51,8 +51,9 @@ export default function BaseClient({ user, base, onSignOut }: BaseClientProps) {
         <BaseHeader baseName={base.name} />
         <TableNav
           tables={base.tables}
-          activeTableId={base.tables[0]?.id ?? ""}
+          activeTableId={activeTableId}
           baseId={base.id}
+          onTableChange={setActiveTableId}
         />
 
         <div className="flex flex-1 flex-col">
