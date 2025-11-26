@@ -5,7 +5,7 @@ import {
   getCoreRowModel,
   flexRender,
 } from "@tanstack/react-table";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import type { columns, rows } from "~/server/db/schema";
 import { api } from "~/trpc/react";
 import { Plus } from "lucide-react";
@@ -23,12 +23,25 @@ export default function Table({
   rows,
   isLoading,
 }: TableProps) {
-  if (isLoading) {
-    return <div className="p-4 text-gray-500"> Loading...</div>;
-  }
-  if (!columns.length) {
-    return <div className="p-4 text-gray-500"> No columns found</div>;
-  }
+  const [editingCell, setEditingCell] = useState<{
+    rowId: string;
+    columnId: string;
+  } | null>(null);
+  const [editedValue, setEditedValue] = useState<string>("");
+
+  const utils = api.useUtils();
+
+  const createRow = api.row.create.useMutation({
+    onSuccess: () => {
+      utils.row.getByTableId.invalidate({ tableId });
+    },
+  });
+
+  const updateRow = api.row.update.useMutation({
+    onSuccess: () => {
+      utils.row.getByTableId.invalidate({ tableId });
+    },
+  });
 
   const tanstackColumns = useMemo(
     () =>
@@ -37,13 +50,46 @@ export default function Table({
         header: col.name,
         id: col.id,
         cell: (info: any) => {
-          const value = info.getValue();
+          const value = info.getValue() as string;
+          const rowId = info.row.original.id;
+          const columnId = col.id;
+          const isEditing =
+            editingCell?.rowId === rowId && editingCell?.columnId === columnId;
+
+          if (isEditing) {
+            return (
+              <input
+                autoFocus
+                value={editedValue}
+                onChange={(e) => setEditedValue(e.target.value)}
+                onBlur={() => handleSave(rowId)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    handleSave(rowId);
+                  } else if (e.key === "Escape") {
+                    handleCancel();
+                  }
+                }}
+                className="-mx-1 w-full border-none bg-transparent px-1 outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            );
+          }
+
           return (
-            value || <span className="inline-block h-5 w-full">&nbsp;</span>
+            <div
+              onClick={() => handleCellClick(rowId, columnId, value)}
+              className="h-full w-full cursor-text"
+            >
+              {value || (
+                <span className="inline-block h-5 w-full text-gray-300">
+                  &nbsp;
+                </span>
+              )}
+            </div>
           );
         },
       })),
-    [columns],
+    [columns, editingCell, editedValue],
   );
 
   const tanstackRows = useMemo(
@@ -55,12 +101,18 @@ export default function Table({
     [rows],
   );
 
-  const utils = api.useUtils();
-  const createRow = api.row.create.useMutation({
-    onSuccess: () => {
-      utils.row.getByTableId.invalidate({ tableId });
-    },
+  const table = useReactTable({
+    columns: tanstackColumns,
+    data: tanstackRows,
+    getCoreRowModel: getCoreRowModel(),
   });
+
+  if (isLoading) {
+    return <div className="p-4 text-gray-500"> Loading...</div>;
+  }
+  if (!columns.length) {
+    return <div className="p-4 text-gray-500"> No columns found</div>;
+  }
 
   const handleAddRow = () => {
     const emptyData: Record<string, string> = {};
@@ -75,11 +127,40 @@ export default function Table({
     });
   };
 
-  const table = useReactTable({
-    columns: tanstackColumns,
-    data: tanstackRows,
-    getCoreRowModel: getCoreRowModel(),
-  });
+  const handleCellClick = (
+    rowId: string,
+    columnId: string,
+    currentValue: string,
+  ) => {
+    setEditingCell({ rowId, columnId });
+    setEditedValue(currentValue || "");
+  };
+
+  const handleSave = (rowId: string) => {
+    if (!editingCell) return;
+
+    // find the original row data
+    const originalRow = rows.find((r) => r.id === rowId);
+    if (!originalRow) return;
+
+    // merge the edited value into the row's JSONB data
+    const updatedData = {
+      ...(originalRow.data as Record<string, string>),
+      [editingCell.columnId]: editedValue,
+    };
+
+    updateRow.mutate({
+      id: rowId,
+      data: updatedData,
+    });
+
+    setEditingCell(null);
+  };
+
+  const handleCancel = () => {
+    setEditingCell(null);
+    setEditedValue("");
+  };
 
   return (
     <div className="h-full w-full overflow-auto">
