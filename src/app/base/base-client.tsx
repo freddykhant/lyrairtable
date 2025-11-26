@@ -63,6 +63,7 @@ export default function BaseClient({ user, base, onSignOut }: BaseClientProps) {
             <TableSidebar isOpen={sidebarOpen} />
             <div className="flex-1 overflow-auto bg-white text-sm">
               <Table
+                tableId={activeTableId}
                 columns={tableData?.columns ?? EMPTY_COLUMNS}
                 rows={rowsData ?? EMPTY_ROWS}
                 isLoading={tableLoading || rowsLoading}

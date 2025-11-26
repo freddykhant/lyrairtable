@@ -4,18 +4,25 @@ import {
   useReactTable,
   getCoreRowModel,
   flexRender,
-  createColumnHelper,
 } from "@tanstack/react-table";
 import { useMemo } from "react";
 import type { columns, rows } from "~/server/db/schema";
+import { api } from "~/trpc/react";
+import { Plus } from "lucide-react";
 
 interface TableProps {
+  tableId: string;
   columns: (typeof columns.$inferSelect)[];
   rows: (typeof rows.$inferSelect)[];
   isLoading: boolean;
 }
 
-export default function Table({ columns, rows, isLoading }: TableProps) {
+export default function Table({
+  tableId,
+  columns,
+  rows,
+  isLoading,
+}: TableProps) {
   if (isLoading) {
     return <div className="p-4 text-gray-500"> Loading...</div>;
   }
@@ -29,6 +36,12 @@ export default function Table({ columns, rows, isLoading }: TableProps) {
         accessorKey: col.id,
         header: col.name,
         id: col.id,
+        cell: (info: any) => {
+          const value = info.getValue();
+          return (
+            value || <span className="inline-block h-5 w-full">&nbsp;</span>
+          );
+        },
       })),
     [columns],
   );
@@ -41,6 +54,26 @@ export default function Table({ columns, rows, isLoading }: TableProps) {
       })),
     [rows],
   );
+
+  const utils = api.useUtils();
+  const createRow = api.row.create.useMutation({
+    onSuccess: () => {
+      utils.row.getByTableId.invalidate({ tableId });
+    },
+  });
+
+  const handleAddRow = () => {
+    const emptyData: Record<string, string> = {};
+    columns.forEach((col) => {
+      emptyData[col.id] = "";
+    });
+
+    createRow.mutate({
+      tableId: tableId,
+      data: emptyData,
+      order: rows.length,
+    });
+  };
 
   const table = useReactTable({
     columns: tanstackColumns,
@@ -77,7 +110,7 @@ export default function Table({ columns, rows, isLoading }: TableProps) {
               {row.getVisibleCells().map((cell) => (
                 <td
                   key={cell.id}
-                  className="border-r border-b border-gray-200 px-4 py-2 text-sm text-gray-900"
+                  className="border-r border-b border-gray-200 px-4 py-1.5 text-sm text-gray-900"
                 >
                   {flexRender(cell.column.columnDef.cell, cell.getContext())}
                 </td>
@@ -86,6 +119,19 @@ export default function Table({ columns, rows, isLoading }: TableProps) {
           ))}
         </tbody>
         <tfoot>
+          <tr
+            onClick={handleAddRow}
+            className="group cursor-pointer hover:bg-gray-50"
+          >
+            <td
+              colSpan={columns.length}
+              className="border-r border-b border-gray-200 px-3 py-2.5 text-sm text-gray-400"
+            >
+              <div className="flex items-center gap-2">
+                <Plus size={16} className="text-gray-400" />
+              </div>
+            </td>
+          </tr>
           <tr>
             <td
               colSpan={table.getAllColumns().length}
