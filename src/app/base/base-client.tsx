@@ -48,7 +48,7 @@ export default function BaseClient({ user, base, onSignOut }: BaseClientProps) {
       <CollapsedSidebar user={user} onSignOut={onSignOut} />
 
       <div className="flex flex-1 flex-col bg-gray-50">
-        <BaseHeader baseName={base.name} />
+        <BaseHeader baseId={base.id} baseName={base.name} />
         <TableNav
           tables={base.tables}
           activeTableId={activeTableId}
