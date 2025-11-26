@@ -29,9 +29,11 @@ building lyra airtable clone as part of my take home assessment with lyra
 t3 stack
 
 - next app router
+- next auth (google)
 - tailwind
 - trpc
 - drizzle
 - postgres neon
-- tanstack
+- tanstack table
+- tan stack virtualizer
 - fakerjs
