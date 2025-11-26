@@ -97,4 +97,15 @@ export const baseRouter = createTRPCRouter({
 
       return base;
     }),
+
+  // update base
+  update: protectedProcedure
+    .input(z.object({ id: z.string(), name: z.string().min(1) }))
+    .mutation(async ({ ctx, input }) => {
+      return await ctx.db
+        .update(bases)
+        .set({ name: input.name })
+        .where(eq(bases.id, input.id))
+        .returning();
+    }),
 });
