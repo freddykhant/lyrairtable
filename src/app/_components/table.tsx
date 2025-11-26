@@ -6,6 +6,7 @@ import {
   flexRender,
   createColumnHelper,
 } from "@tanstack/react-table";
+import { useMemo } from "react";
 import type { columns, rows } from "~/server/db/schema";
 
 interface TableProps {
@@ -22,16 +23,24 @@ export default function Table({ columns, rows, isLoading }: TableProps) {
     return <div className="p-4 text-gray-500"> No columns found</div>;
   }
 
-  const tanstackColumns = columns.map((col) => ({
-    accessorKey: col.id,
-    header: col.name,
-    id: col.id,
-  }));
+  const tanstackColumns = useMemo(
+    () =>
+      columns.map((col) => ({
+        accessorKey: col.id,
+        header: col.name,
+        id: col.id,
+      })),
+    [columns],
+  );
 
-  const tanstackRows = rows.map((row) => ({
-    id: row.id,
-    ...(row.data as Record<string, unknown>),
-  }));
+  const tanstackRows = useMemo(
+    () =>
+      rows.map((row) => ({
+        id: row.id,
+        ...(row.data as Record<string, string>),
+      })),
+    [rows],
+  );
 
   const table = useReactTable({
     columns: tanstackColumns,

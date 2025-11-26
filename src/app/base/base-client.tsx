@@ -5,10 +5,13 @@ import TableHeader from "../_components/table-header";
 import TableSidebar from "../_components/table-sidebar";
 import TableNav from "../_components/table-nav";
 import { CollapsedSidebar } from "../_components/collapsed-sidebar";
-import type { tables, users } from "~/server/db/schema";
+import type { columns, rows, tables, users } from "~/server/db/schema";
 import { useState } from "react";
 import Table from "../_components/table";
 import { api } from "~/trpc/react";
+
+const EMPTY_COLUMNS: (typeof columns.$inferSelect)[] = [];
+const EMPTY_ROWS: (typeof rows.$inferSelect)[] = [];
 
 interface BaseClientProps {
   user: {
@@ -59,8 +62,8 @@ export default function BaseClient({ user, base, onSignOut }: BaseClientProps) {
             <TableSidebar isOpen={sidebarOpen} />
             <div className="flex-1 overflow-auto bg-white p-4 text-sm">
               <Table
-                columns={tableData?.columns ?? []}
-                rows={rowsData ?? []}
+                columns={tableData?.columns ?? EMPTY_COLUMNS}
+                rows={rowsData ?? EMPTY_ROWS}
                 isLoading={tableLoading || rowsLoading}
               />
             </div>
