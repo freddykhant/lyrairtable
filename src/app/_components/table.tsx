@@ -32,6 +32,11 @@ export default function Table({
   } | null>(null);
   const [editedValue, setEditedValue] = useState<string>("");
 
+  const [selectedCell, setSelectedCell] = useState<{
+    rowIndex: number;
+    columnIndex: number;
+  } | null>(null);
+
   // ref for scrollable container
   const parentRef = useRef<HTMLDivElement>(null);
 
@@ -66,8 +71,14 @@ export default function Table({
           const value = info.getValue() as string;
           const rowId = info.row.original.id;
           const columnId = col.id;
+          const rowIndex = info.row.index;
+          const columnIndex = columns.findIndex((c) => c.id === columnId);
+
           const isEditing =
             editingCell?.rowId === rowId && editingCell?.columnId === columnId;
+          const isSelected =
+            selectedCell?.rowIndex === rowIndex &&
+            selectedCell?.columnIndex === columnIndex;
 
           if (isEditing) {
             return (
@@ -90,8 +101,11 @@ export default function Table({
 
           return (
             <div
-              onClick={() => handleCellClick(rowId, columnId, value)}
-              className="h-full w-full cursor-text"
+              onClick={() => setSelectedCell({ rowIndex, columnIndex })}
+              onDoubleClick={() => handleCellClick(rowId, columnId, value)}
+              className={`h-full w-full cursor-text ${
+                isSelected ? "ring-inset-2 ring-2 ring-blue-500" : ""
+              }`}
             >
               {value || (
                 <span className="inline-block h-5 w-full text-gray-300">
@@ -102,7 +116,7 @@ export default function Table({
           );
         },
       })),
-    [columns, editingCell, editedValue],
+    [columns, editingCell, editedValue, selectedCell],
   );
 
   const tanstackRows = useMemo(
@@ -194,8 +208,62 @@ export default function Table({
     });
   };
 
+  // keyboard navigation handler
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (!selectedCell) return;
+
+    const { rowIndex, columnIndex } = selectedCell;
+    const maxRowIndex = rows.length - 1;
+    const maxColIndex = columns.length - 1;
+
+    let newRowIndex = rowIndex;
+    let newColIndex = columnIndex;
+
+    switch (e.key) {
+      case "ArrowUp":
+        e.preventDefault();
+        newRowIndex = Math.max(0, rowIndex - 1);
+        break;
+      case "ArrowDown":
+        e.preventDefault();
+        newRowIndex = Math.min(maxRowIndex, rowIndex + 1);
+        break;
+      case "ArrowLeft":
+        e.preventDefault();
+        newColIndex = Math.max(0, columnIndex - 1);
+        break;
+      case "ArrowRight":
+      case "Tab":
+        e.preventDefault();
+        newColIndex = Math.min(maxColIndex, columnIndex + 1);
+        break;
+      case "Enter":
+        e.preventDefault();
+        // start editing the selected cell
+        const row = rows[rowIndex];
+        const column = columns[columnIndex];
+        if (row && column) {
+          handleCellClick(
+            row.id,
+            column.id,
+            (row.data as Record<string, string>)[column.id] || "",
+          );
+        }
+        break;
+      default:
+        return;
+    }
+
+    setSelectedCell({ rowIndex: newRowIndex, columnIndex: newColIndex });
+  };
+
   return (
-    <div ref={parentRef} className="h-full w-full overflow-auto">
+    <div
+      ref={parentRef}
+      className="h-full w-full overflow-auto"
+      onKeyDown={handleKeyDown}
+      tabIndex={0}
+    >
       <table className="w-full">
         <thead
           className="sticky top-0 z-10 bg-gray-50"
