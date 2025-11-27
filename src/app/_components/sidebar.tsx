@@ -13,12 +13,15 @@ import {
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { api } from "~/trpc/react";
+import { useRouter } from "next/navigation";
 
 interface SidebarProps {
   isOpen: boolean;
 }
 
 export function Sidebar({ isOpen }: SidebarProps) {
+  const router = useRouter();
   const navItems = [
     { icon: Home, label: "Home", href: "/" },
     { icon: Star, label: "Starred", href: "/starred" },
@@ -37,6 +40,18 @@ export function Sidebar({ isOpen }: SidebarProps) {
   }
 
   const pathname = usePathname();
+
+  const createBase = api.base.create.useMutation({
+    onSuccess: (newBase) => {
+      if (newBase) {
+        router.push(`/base/${newBase.id}`);
+      }
+    },
+  });
+
+  function handleCreateBase() {
+    createBase.mutate({ name: "Untitled Base" });
+  }
 
   return (
     <aside className="flex h-full w-64 flex-col border-r border-gray-300 bg-white">
@@ -98,7 +113,10 @@ export function Sidebar({ isOpen }: SidebarProps) {
         ))}
 
         {/* Create Button */}
-        <button className="mt-4 flex w-full items-center justify-center gap-2 rounded-lg bg-blue-600 py-2 text-sm font-semibold text-white transition-opacity hover:bg-blue-700">
+        <button
+          onClick={handleCreateBase}
+          className="mt-4 flex w-full items-center justify-center gap-2 rounded-lg bg-blue-600 py-2 text-sm font-semibold text-white transition-opacity hover:bg-blue-700"
+        >
           <Plus size={18} />
           <span>Create</span>
         </button>
