@@ -28,8 +28,6 @@ export default function Table({
     columnId: string;
   } | null>(null);
   const [editedValue, setEditedValue] = useState<string>("");
-  const [editingColumn, setEditingColumn] = useState<string | null>(null);
-  const [editedColumnName, setEditedColumnName] = useState<string>("");
 
   const utils = api.useUtils();
 
@@ -46,12 +44,6 @@ export default function Table({
   });
 
   const createColumn = api.column.create.useMutation({
-    onSuccess: () => {
-      utils.table.getById.invalidate();
-    },
-  });
-
-  const updateColumn = api.column.update.useMutation({
     onSuccess: () => {
       utils.table.getById.invalidate();
     },
@@ -188,30 +180,6 @@ export default function Table({
     });
   };
 
-  const handleColumnClick = (columnId: string, currentName: string) => {
-    setEditingColumn(columnId);
-    setEditedColumnName(currentName);
-  };
-
-  const handleColumnSave = (columnId: string) => {
-    if (!editingColumn || !editedColumnName.trim()) {
-      handleColumnCancel();
-      return;
-    }
-
-    updateColumn.mutate({
-      id: columnId,
-      name: editedColumnName,
-    });
-
-    setEditingColumn(null);
-  };
-
-  const handleColumnCancel = () => {
-    setEditingColumn(null);
-    setEditedColumnName("");
-  };
-
   return (
     <div className="h-full w-full overflow-auto">
       <table className="w-full border-collapse">
@@ -219,49 +187,17 @@ export default function Table({
           {/* table header */}
           {table.getHeaderGroups().map((headerGroup) => (
             <tr key={headerGroup.id}>
-              {headerGroup.headers.map((header) => {
-                const columnId = header.column.id;
-                const isEditingHeader = editingColumn === columnId;
-
-                return (
-                  <th
-                    key={header.id}
-                    className="border-r border-b border-gray-200 px-4 py-2 text-left text-xs font-medium text-gray-700"
-                  >
-                    {isEditingHeader ? (
-                      <input
-                        autoFocus
-                        value={editedColumnName}
-                        onChange={(e) => setEditedColumnName(e.target.value)}
-                        onBlur={() => handleColumnSave(columnId)}
-                        onKeyDown={(e) => {
-                          if (e.key === "Enter") {
-                            handleColumnSave(columnId);
-                          } else if (e.key === "Escape") {
-                            handleColumnCancel();
-                          }
-                        }}
-                        className="-mx-1 w-full border-none bg-transparent px-1 outline-none focus:ring-2 focus:ring-blue-500"
-                      />
-                    ) : (
-                      <div
-                        onClick={() =>
-                          handleColumnClick(
-                            columnId,
-                            header.column.columnDef.header as string,
-                          )
-                        }
-                        className="-mx-1 cursor-pointer rounded px-1 hover:bg-gray-100"
-                      >
-                        {flexRender(
-                          header.column.columnDef.header,
-                          header.getContext(),
-                        )}
-                      </div>
-                    )}
-                  </th>
-                );
-              })}
+              {headerGroup.headers.map((header) => (
+                <th
+                  key={header.id}
+                  className="border-r border-b border-gray-200 px-4 py-2 text-left text-xs font-medium text-gray-700"
+                >
+                  {flexRender(
+                    header.column.columnDef.header,
+                    header.getContext(),
+                  )}
+                </th>
+              ))}
               <th className="border-b border-gray-200 px-4 py-2">
                 <button
                   onClick={handleAddColumn}
