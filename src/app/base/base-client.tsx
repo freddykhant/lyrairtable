@@ -5,7 +5,7 @@ import TableHeader from "../_components/table-header";
 import TableSidebar from "../_components/table-sidebar";
 import TableNav from "../_components/table-nav";
 import { CollapsedSidebar } from "../_components/collapsed-sidebar";
-import type { columns, rows, tables, users } from "~/server/db/schema";
+import type { columns, rows, tables } from "~/server/db/schema";
 import { useState } from "react";
 import Table from "../_components/table";
 import { api } from "~/trpc/react";
@@ -51,7 +51,7 @@ export default function BaseClient({ user, base, onSignOut }: BaseClientProps) {
 
   const { data: rowsData, isLoading: rowsLoading } =
     api.row.getByTableId.useQuery(
-      { tableId: activeTableId, limit: 50 },
+      { tableId: activeTableId, limit: 1000 },
       { enabled: !!activeTableId },
     );
 
