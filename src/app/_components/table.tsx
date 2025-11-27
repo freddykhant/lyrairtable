@@ -91,7 +91,7 @@ export default function Table({
                     handleCancel();
                   }
                 }}
-                className="-mx-1 w-full border-none bg-transparent px-1 outline-none focus:ring-2 focus:ring-blue-500"
+                className="-mx-1 w-full border-none bg-transparent px-1 outline-none"
               />
             );
           }
