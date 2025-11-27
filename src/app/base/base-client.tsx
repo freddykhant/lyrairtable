@@ -31,6 +31,18 @@ export default function BaseClient({ user, base, onSignOut }: BaseClientProps) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [activeTableId, setActiveTableId] = useState(base.tables[0]?.id ?? "");
 
+  const utils = api.useUtils();
+
+  const bulkSeedMutation = api.bulk.seedRows.useMutation({
+    onSuccess: () => {
+      utils.row.getByTableId.invalidate({ tableId: activeTableId });
+    },
+  });
+
+  const handleAddRows = () => {
+    bulkSeedMutation.mutate({ tableId: activeTableId, count: 100000 });
+  };
+
   const { data: tableData, isLoading: tableLoading } =
     api.table.getById.useQuery(
       { id: activeTableId, baseId: base.id },
@@ -57,7 +69,10 @@ export default function BaseClient({ user, base, onSignOut }: BaseClientProps) {
         />
 
         <div className="flex flex-1 flex-col">
-          <TableHeader onToggleSidebar={() => setSidebarOpen(!sidebarOpen)} />
+          <TableHeader
+            onToggleSidebar={() => setSidebarOpen(!sidebarOpen)}
+            onAddRows={handleAddRows}
+          />
 
           <div className="flex flex-1 overflow-hidden">
             <TableSidebar isOpen={sidebarOpen} />
