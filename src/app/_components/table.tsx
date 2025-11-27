@@ -5,7 +5,8 @@ import {
   getCoreRowModel,
   flexRender,
 } from "@tanstack/react-table";
-import { useMemo, useState } from "react";
+import { useVirtualizer } from "@tanstack/react-virtual";
+import { useMemo, useState, useRef, useEffect } from "react";
 import type { columns, rows } from "~/server/db/schema";
 import { api } from "~/trpc/react";
 import { Plus } from "lucide-react";
@@ -30,6 +31,9 @@ export default function Table({
     columnId: string;
   } | null>(null);
   const [editedValue, setEditedValue] = useState<string>("");
+
+  // ref for scrollable container
+  const parentRef = useRef<HTMLDivElement>(null);
 
   const utils = api.useUtils();
 
@@ -113,6 +117,13 @@ export default function Table({
     columns: tanstackColumns,
     data: tanstackRows,
     getCoreRowModel: getCoreRowModel(),
+  });
+
+  const rowVirtualizer = useVirtualizer({
+    count: totalRows, // total rows in db
+    getScrollElement: () => parentRef.current, // scrollable container
+    estimateSize: () => 35, // estimated row heightin px
+    overscan: 10, // render 10 extra rows above/below viewport
   });
 
   if (isLoading) {
