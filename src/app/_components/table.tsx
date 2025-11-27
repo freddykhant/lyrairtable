@@ -61,6 +61,7 @@ export default function Table({
         accessorKey: col.id,
         header: col.name,
         id: col.id,
+        size: 200,
         cell: (info: any) => {
           const value = info.getValue() as string;
           const rowId = info.row.original.id;
@@ -195,15 +196,26 @@ export default function Table({
 
   return (
     <div ref={parentRef} className="h-full w-full overflow-auto">
-      <table className="w-full border-collapse">
-        <thead className="sticky top-0 bg-gray-50">
-          {/* table header */}
+      <table className="w-full">
+        <thead
+          className="sticky top-0 z-10 bg-gray-50"
+          style={{ display: "block" }}
+        >
           {table.getHeaderGroups().map((headerGroup) => (
-            <tr key={headerGroup.id}>
+            <tr
+              key={headerGroup.id}
+              style={{ display: "flex" }}
+              className="border-b border-gray-200"
+            >
               {headerGroup.headers.map((header) => (
                 <th
                   key={header.id}
-                  className="border-r border-b border-gray-200 px-4 py-2 text-left text-xs font-medium text-gray-700"
+                  style={{
+                    width: header.getSize(),
+                    minWidth: header.getSize(),
+                    display: "block",
+                  }}
+                  className="border-r border-gray-200 px-4 py-2 text-left text-xs font-medium text-gray-700"
                 >
                   {flexRender(
                     header.column.columnDef.header,
@@ -211,7 +223,10 @@ export default function Table({
                   )}
                 </th>
               ))}
-              <th className="border-b border-gray-200 px-4 py-2">
+              <th
+                className="border-gray-200 px-4 py-2"
+                style={{ display: "block" }}
+              >
                 <button
                   onClick={handleAddColumn}
                   className="flex items-center gap-1 text-xs text-gray-600 hover:text-gray-900"
@@ -223,9 +238,9 @@ export default function Table({
           ))}
         </thead>
 
-        {/* body */}
         <tbody
           style={{
+            display: "block",
             height: `${rowVirtualizer.getTotalSize()}px`,
             position: "relative",
           }}
@@ -239,16 +254,26 @@ export default function Table({
                 key={row.id}
                 className="hover:bg-gray-50"
                 style={{
+                  display: "flex",
                   position: "absolute",
                   top: 0,
                   left: 0,
                   width: "100%",
                   transform: `translateY(${virtualRow.start}px)`,
+                  height: `${virtualRow.size}px`,
                 }}
               >
                 {row.getVisibleCells().map((cell) => (
                   <td
                     key={cell.id}
+                    style={{
+                      display: "block",
+                      width: cell.column.getSize(),
+                      minWidth: cell.column.getSize(),
+                      overflow: "hidden",
+                      textOverflow: "ellipsis",
+                      whiteSpace: "nowrap",
+                    }}
                     className="border-r border-b border-gray-200 px-4 py-1.5 text-sm text-gray-900"
                   >
                     {flexRender(cell.column.columnDef.cell, cell.getContext())}
@@ -258,26 +283,29 @@ export default function Table({
             );
           })}
         </tbody>
-        <tfoot>
+
+        <tfoot
+          style={{ display: "block" }}
+          className="border-t border-gray-200"
+        >
           <tr
             onClick={handleAddRow}
+            style={{ display: "flex" }}
             className="group cursor-pointer hover:bg-gray-50"
           >
             <td
-              colSpan={columns.length}
-              className="border-r border-b border-gray-200 px-3 py-2.5 text-sm text-gray-400"
+              className="border-b border-gray-200 px-3 py-2.5 text-sm text-gray-400"
+              style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}
             >
-              <div className="flex items-center gap-2">
-                <Plus size={16} className="text-gray-400" />
-              </div>
+              <Plus size={16} className="text-gray-400" />
             </td>
           </tr>
-          <tr>
+          <tr style={{ display: "block" }}>
             <td
-              colSpan={table.getAllColumns().length}
-              className="border-t border-gray-200 px-4 py-2 text-left text-xs font-medium text-gray-700"
+              className="px-4 py-2 text-left text-xs font-medium text-gray-700"
+              style={{ display: "block" }}
             >
-              {rows.length} records
+              {totalRows.toLocaleString()} records
             </td>
           </tr>
         </tfoot>
