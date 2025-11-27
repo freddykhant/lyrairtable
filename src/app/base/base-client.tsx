@@ -72,6 +72,7 @@ export default function BaseClient({ user, base, onSignOut }: BaseClientProps) {
           <TableHeader
             onToggleSidebar={() => setSidebarOpen(!sidebarOpen)}
             onAddRows={handleAddRows}
+            isLoading={bulkSeedMutation.isPending}
           />
 
           <div className="flex flex-1 overflow-hidden">
