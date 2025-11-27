@@ -3,6 +3,7 @@ import { tableRouter } from "~/server/api/routers/table";
 import { columnRouter } from "~/server/api/routers/column";
 import { rowRouter } from "~/server/api/routers/row";
 import { createCallerFactory, createTRPCRouter } from "~/server/api/trpc";
+import { bulkRouter } from "~/server/api/routers/bulk";
 
 /**
  * This is the primary router for your server.
