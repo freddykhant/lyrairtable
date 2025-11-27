@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { eq, asc } from "drizzle-orm";
+import { eq, asc, sql } from "drizzle-orm";
 
 import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
 import { rows, tables } from "~/server/db/schema";
@@ -59,12 +59,24 @@ export const rowRouter = createTRPCRouter({
         throw new Error("Table not found");
       }
 
-      return await ctx.db.query.rows.findMany({
+      // fetch rows
+      const tableRows = await ctx.db.query.rows.findMany({
         where: eq(rows.tableId, input.tableId),
         limit: input.limit,
         offset: input.offset,
         orderBy: (rows, { asc }) => [asc(rows.order)],
       });
+
+      // get total count
+      const [{ count } = { count: 0 }] = await ctx.db
+        .select({ count: sql<number>`count(*)` })
+        .from(rows)
+        .where(eq(rows.tableId, input.tableId));
+
+      return {
+        rows: tableRows,
+        total: count,
+      };
     }),
 
   // update row
