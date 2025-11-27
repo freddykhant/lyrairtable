@@ -81,7 +81,8 @@ export default function BaseClient({ user, base, onSignOut }: BaseClientProps) {
               <Table
                 tableId={activeTableId}
                 columns={tableData?.columns ?? EMPTY_COLUMNS}
-                rows={rowsData ?? EMPTY_ROWS}
+                rows={rowsData?.rows ?? EMPTY_ROWS}
+                totalRows={rowsData?.total ?? 0}
                 isLoading={tableLoading || rowsLoading}
               />
             </div>

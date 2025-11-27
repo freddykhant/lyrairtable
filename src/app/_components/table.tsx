@@ -14,6 +14,7 @@ interface TableProps {
   tableId: string;
   columns: (typeof columns.$inferSelect)[];
   rows: (typeof rows.$inferSelect)[];
+  totalRows: number;
   isLoading: boolean;
 }
 
@@ -21,6 +22,7 @@ export default function Table({
   tableId,
   columns,
   rows,
+  totalRows,
   isLoading,
 }: TableProps) {
   const [editingCell, setEditingCell] = useState<{
