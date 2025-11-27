@@ -76,9 +76,6 @@ export default function Table({
 
           const isEditing =
             editingCell?.rowId === rowId && editingCell?.columnId === columnId;
-          const isSelected =
-            selectedCell?.rowIndex === rowIndex &&
-            selectedCell?.columnIndex === columnIndex;
 
           if (isEditing) {
             return (
@@ -103,9 +100,7 @@ export default function Table({
             <div
               onClick={() => setSelectedCell({ rowIndex, columnIndex })}
               onDoubleClick={() => handleCellClick(rowId, columnId, value)}
-              className={`h-full w-full cursor-text ${
-                isSelected ? "ring-inset-2 ring-2 ring-blue-500" : ""
-              }`}
+              className="h-full w-full cursor-text"
             >
               {value || (
                 <span className="inline-block h-5 w-full text-gray-300">
@@ -116,7 +111,7 @@ export default function Table({
           );
         },
       })),
-    [columns, editingCell, editedValue, selectedCell],
+    [columns, editingCell, editedValue],
   );
 
   const tanstackRows = useMemo(
@@ -260,7 +255,7 @@ export default function Table({
   return (
     <div
       ref={parentRef}
-      className="h-full w-full overflow-auto"
+      className="h-full w-full overflow-auto outline-none"
       onKeyDown={handleKeyDown}
       tabIndex={0}
     >
@@ -331,22 +326,51 @@ export default function Table({
                   height: `${virtualRow.size}px`,
                 }}
               >
-                {row.getVisibleCells().map((cell) => (
-                  <td
-                    key={cell.id}
-                    style={{
-                      display: "block",
-                      width: cell.column.getSize(),
-                      minWidth: cell.column.getSize(),
-                      overflow: "hidden",
-                      textOverflow: "ellipsis",
-                      whiteSpace: "nowrap",
-                    }}
-                    className="border-r border-b border-gray-200 px-4 py-1.5 text-sm text-gray-900"
-                  >
-                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                  </td>
-                ))}
+                {row.getVisibleCells().map((cell, colIndex) => {
+                  const isSelected =
+                    selectedCell?.rowIndex === virtualRow.index &&
+                    selectedCell?.columnIndex === colIndex;
+
+                  const rowData = row.original as {
+                    id: string;
+                    [key: string]: unknown;
+                  };
+                  const columnId = cell.column.id;
+                  const value = (rowData[columnId] as string) || "";
+
+                  return (
+                    <td
+                      key={cell.id}
+                      onClick={() =>
+                        setSelectedCell({
+                          rowIndex: virtualRow.index,
+                          columnIndex: colIndex,
+                        })
+                      }
+                      onDoubleClick={() =>
+                        handleCellClick(rowData.id, columnId, value)
+                      }
+                      style={{
+                        display: "block",
+                        width: cell.column.getSize(),
+                        minWidth: cell.column.getSize(),
+                        overflow: "hidden",
+                        textOverflow: "ellipsis",
+                        whiteSpace: "nowrap",
+                        cursor: "text",
+                        ...(isSelected
+                          ? { boxShadow: "inset 0 0 0 2px #3b82f6" }
+                          : {}),
+                      }}
+                      className="border-r border-b border-gray-200 px-4 py-1.5 text-sm text-gray-900"
+                    >
+                      {flexRender(
+                        cell.column.columnDef.cell,
+                        cell.getContext(),
+                      )}
+                    </td>
+                  );
+                })}
               </tr>
             );
           })}
