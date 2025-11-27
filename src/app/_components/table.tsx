@@ -194,7 +194,7 @@ export default function Table({
   };
 
   return (
-    <div className="h-full w-full overflow-auto">
+    <div ref={parentRef} className="h-full w-full overflow-auto">
       <table className="w-full border-collapse">
         <thead className="sticky top-0 bg-gray-50">
           {/* table header */}
@@ -224,19 +224,39 @@ export default function Table({
         </thead>
 
         {/* body */}
-        <tbody>
-          {table.getRowModel().rows.map((row) => (
-            <tr key={row.id} className="hover:bg-gray-50">
-              {row.getVisibleCells().map((cell) => (
-                <td
-                  key={cell.id}
-                  className="border-r border-b border-gray-200 px-4 py-1.5 text-sm text-gray-900"
-                >
-                  {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                </td>
-              ))}
-            </tr>
-          ))}
+        <tbody
+          style={{
+            height: `${rowVirtualizer.getTotalSize()}px`,
+            position: "relative",
+          }}
+        >
+          {rowVirtualizer.getVirtualItems().map((virtualRow) => {
+            const row = table.getRowModel().rows[virtualRow.index];
+            if (!row) return null;
+
+            return (
+              <tr
+                key={row.id}
+                className="hover:bg-gray-50"
+                style={{
+                  position: "absolute",
+                  top: 0,
+                  left: 0,
+                  width: "100%",
+                  transform: `translateY(${virtualRow.start}px)`,
+                }}
+              >
+                {row.getVisibleCells().map((cell) => (
+                  <td
+                    key={cell.id}
+                    className="border-r border-b border-gray-200 px-4 py-1.5 text-sm text-gray-900"
+                  >
+                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                  </td>
+                ))}
+              </tr>
+            );
+          })}
         </tbody>
         <tfoot>
           <tr
