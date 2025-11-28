@@ -17,6 +17,7 @@ interface TableProps {
   rows: (typeof rows.$inferSelect)[];
   totalRows: number;
   isLoading: boolean;
+  onFetchMore: () => void;
 }
 
 export default function Table({
@@ -25,6 +26,7 @@ export default function Table({
   rows,
   totalRows,
   isLoading,
+  onFetchMore,
 }: TableProps) {
   const [editingCell, setEditingCell] = useState<{
     rowId: string;

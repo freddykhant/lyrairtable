@@ -66,6 +66,23 @@ export default function BaseClient({ user, base, onSignOut }: BaseClientProps) {
     }
   }, [rowsData, activeTableId]);
 
+  // obvious
+  const fetchMoreRows = async () => {
+    if (allRows.length >= totalRows) return; // already have all rows
+
+    try {
+      const result = await utils.row.getByTableId.fetch({
+        tableId: activeTableId,
+        limit: 100,
+        offset: allRows.length, // start where we left off
+      });
+
+      setAllRows((prev) => [...prev, ...result.rows]); // append new rows
+    } catch (error) {
+      console.error("Failed to fetch more rows:", error);
+    }
+  };
+
   return (
     <div className="flex h-screen">
       <CollapsedSidebar user={user} onSignOut={onSignOut} />
@@ -95,6 +112,7 @@ export default function BaseClient({ user, base, onSignOut }: BaseClientProps) {
                 rows={rowsData?.rows ?? EMPTY_ROWS}
                 totalRows={rowsData?.total ?? 0}
                 isLoading={tableLoading || rowsLoading}
+                onFetchMore={fetchMoreRows}
               />
             </div>
           </div>
