@@ -6,7 +6,7 @@ import TableSidebar from "../_components/table-sidebar";
 import TableNav from "../_components/table-nav";
 import { CollapsedSidebar } from "../_components/collapsed-sidebar";
 import type { columns, rows, tables } from "~/server/db/schema";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Table from "../_components/table";
 import { api } from "~/trpc/react";
 
@@ -30,6 +30,8 @@ interface BaseClientProps {
 export default function BaseClient({ user, base, onSignOut }: BaseClientProps) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [activeTableId, setActiveTableId] = useState(base.tables[0]?.id ?? "");
+  const [allRows, setAllRows] = useState<(typeof rows.$inferSelect)[]>([]);
+  const [totalRows, setTotalRows] = useState(0);
 
   const utils = api.useUtils();
 
@@ -49,11 +51,20 @@ export default function BaseClient({ user, base, onSignOut }: BaseClientProps) {
       { enabled: !!activeTableId && !!base.id },
     );
 
+  // intitial fetch (smaller batches now)
   const { data: rowsData, isLoading: rowsLoading } =
     api.row.getByTableId.useQuery(
-      { tableId: activeTableId, limit: 1000 },
+      { tableId: activeTableId, limit: 100, offset: 0 },
       { enabled: !!activeTableId },
     );
+
+  // intialise allRows when data loads
+  useEffect(() => {
+    if (rowsData && activeTableId) {
+      setAllRows(rowsData.rows);
+      setTotalRows(rowsData.total);
+    }
+  }, [rowsData, activeTableId]);
 
   return (
     <div className="flex h-screen">
