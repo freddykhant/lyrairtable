@@ -66,7 +66,7 @@ export default function BaseClient({ user, base, onSignOut }: BaseClientProps) {
     }
   }, [rowsData, activeTableId]);
 
-  // obvious
+  // fetch more rows for infinite scroll
   const fetchMoreRows = async () => {
     if (allRows.length >= totalRows) return; // already have all rows
 
@@ -81,6 +81,18 @@ export default function BaseClient({ user, base, onSignOut }: BaseClientProps) {
     } catch (error) {
       console.error("Failed to fetch more rows:", error);
     }
+  };
+
+  // update a row in local state (optimistic update)
+  const handleRowUpdate = (
+    rowId: string,
+    updatedData: Record<string, string>,
+  ) => {
+    setAllRows((prev) =>
+      prev.map((row) =>
+        row.id === rowId ? { ...row, data: updatedData } : row,
+      ),
+    );
   };
 
   return (
@@ -113,6 +125,7 @@ export default function BaseClient({ user, base, onSignOut }: BaseClientProps) {
                 totalRows={totalRows}
                 isLoading={tableLoading || rowsLoading}
                 onFetchMore={fetchMoreRows}
+                onRowUpdate={handleRowUpdate}
               />
             </div>
           </div>

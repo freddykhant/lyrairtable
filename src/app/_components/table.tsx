@@ -18,6 +18,7 @@ interface TableProps {
   totalRows: number;
   isLoading: boolean;
   onFetchMore: () => void;
+  onRowUpdate: (rowId: string, updatedData: Record<string, string>) => void;
 }
 
 export default function Table({
@@ -27,6 +28,7 @@ export default function Table({
   totalRows,
   isLoading,
   onFetchMore,
+  onRowUpdate,
 }: TableProps) {
   const [editingCell, setEditingCell] = useState<{
     rowId: string;
@@ -51,9 +53,8 @@ export default function Table({
   });
 
   const updateRow = api.row.update.useMutation({
-    onSuccess: () => {
-      utils.row.getByTableId.invalidate({ tableId });
-    },
+    // no cache invalidation needed - we're just updating local state
+    // the parent component's `allRows` will naturally show the updated value
   });
 
   const createColumn = api.column.create.useMutation({
@@ -88,8 +89,10 @@ export default function Table({
                 onBlur={() => handleSave(rowId)}
                 onKeyDown={(e) => {
                   if (e.key === "Enter") {
+                    e.stopPropagation(); // prevent keyboard nav from catching this
                     handleSave(rowId);
                   } else if (e.key === "Escape") {
+                    e.stopPropagation();
                     handleCancel();
                   }
                 }}
@@ -197,6 +200,10 @@ export default function Table({
       [editingCell.columnId]: editedValue,
     };
 
+    // update parent state immediately (optimistic update)
+    onRowUpdate(rowId, updatedData);
+
+    // save to database
     updateRow.mutate({
       id: rowId,
       data: updatedData,
@@ -358,15 +365,6 @@ export default function Table({
                   return (
                     <td
                       key={cell.id}
-                      onClick={() =>
-                        setSelectedCell({
-                          rowIndex: virtualRow.index,
-                          columnIndex: colIndex,
-                        })
-                      }
-                      onDoubleClick={() =>
-                        handleCellClick(rowData.id, columnId, value)
-                      }
                       style={{
                         display: "block",
                         width: cell.column.getSize(),
