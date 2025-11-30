@@ -138,6 +138,21 @@ export default function Table({
     overscan: 10, // render 10 extra rows above/below viewport
   });
 
+  useEffect(() => {
+    const virtualItems = rowVirtualizer.getVirtualItems();
+    if (!virtualItems.length) return;
+
+    // get last visible row
+    const lastItem = virtualItems[virtualItems.length - 1];
+    if (!lastItem) return;
+
+    // if near end of loaded rows, fetch more
+    // threshold: when last visible row is within 20 rows of what's loaded
+    if (lastItem.index >= rows.length - 20 && rows.length < totalRows) {
+      onFetchMore();
+    }
+  }, [rowVirtualizer.getVirtualItems(), rows.length, totalRows, onFetchMore]);
+
   if (isLoading) {
     return <div className="p-4 text-gray-500"> Loading...</div>;
   }

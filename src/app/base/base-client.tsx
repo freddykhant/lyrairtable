@@ -30,8 +30,8 @@ interface BaseClientProps {
 export default function BaseClient({ user, base, onSignOut }: BaseClientProps) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [activeTableId, setActiveTableId] = useState(base.tables[0]?.id ?? "");
-  const [allRows, setAllRows] = useState<(typeof rows.$inferSelect)[]>([]);
-  const [totalRows, setTotalRows] = useState(0);
+  const [allRows, setAllRows] = useState<(typeof rows.$inferSelect)[]>([]); // rows accumulator array
+  const [totalRows, setTotalRows] = useState(0); // total rows count
 
   const utils = api.useUtils();
 
@@ -109,8 +109,8 @@ export default function BaseClient({ user, base, onSignOut }: BaseClientProps) {
               <Table
                 tableId={activeTableId}
                 columns={tableData?.columns ?? EMPTY_COLUMNS}
-                rows={rowsData?.rows ?? EMPTY_ROWS}
-                totalRows={rowsData?.total ?? 0}
+                rows={allRows}
+                totalRows={totalRows}
                 isLoading={tableLoading || rowsLoading}
                 onFetchMore={fetchMoreRows}
               />
