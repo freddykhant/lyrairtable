@@ -45,6 +45,7 @@ export const rowRouter = createTRPCRouter({
         tableId: z.string(),
         limit: z.number().min(1).max(1000).default(50),
         offset: z.number().min(0).default(0),
+        searchTerm: z.string().optional(),
       }),
     )
     .query(async ({ ctx, input }) => {
@@ -59,19 +60,27 @@ export const rowRouter = createTRPCRouter({
         throw new Error("Table not found");
       }
 
-      // fetch rows
-      const tableRows = await ctx.db.query.rows.findMany({
-        where: eq(rows.tableId, input.tableId),
-        limit: input.limit,
-        offset: input.offset,
-        orderBy: (rows, { asc }) => [asc(rows.order)],
-      });
+      let whereClause = eq(rows.tableId, input.tableId);
 
-      // get total count
+      // convert JSONB to text + use case insensitive search
+      if (input.searchTerm && input.searchTerm.trim() !== "") {
+        whereClause = sql`${rows.tableId} = ${input.tableId} AND ${rows.data}::text ILIKE ${`%${input.searchTerm}%`}`;
+      }
+
+      // fetch rows
+      const tableRows = await ctx.db
+        .select()
+        .from(rows)
+        .where(whereClause)
+        .limit(input.limit)
+        .offset(input.offset)
+        .orderBy(asc(rows.order));
+
+      // get total count with same filter
       const [{ count } = { count: 0 }] = await ctx.db
         .select({ count: sql<number>`count(*)` })
         .from(rows)
-        .where(eq(rows.tableId, input.tableId));
+        .where(whereClause);
 
       return {
         rows: tableRows,

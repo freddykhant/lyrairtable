@@ -11,7 +11,6 @@ import Table from "../_components/table";
 import { api } from "~/trpc/react";
 
 const EMPTY_COLUMNS: (typeof columns.$inferSelect)[] = [];
-const EMPTY_ROWS: (typeof rows.$inferSelect)[] = [];
 
 interface BaseClientProps {
   user: {
@@ -32,18 +31,18 @@ export default function BaseClient({ user, base, onSignOut }: BaseClientProps) {
   const [activeTableId, setActiveTableId] = useState(base.tables[0]?.id ?? "");
   const [allRows, setAllRows] = useState<(typeof rows.$inferSelect)[]>([]); // rows accumulator array
   const [totalRows, setTotalRows] = useState(0); // total rows count
+  const [debouncedSearchTerm, setDebouncedSearchTerm] = useState("");
+  const [searchTerm, setSearchTerm] = useState("");
 
   const utils = api.useUtils();
 
   const bulkSeedMutation = api.bulk.seedRows.useMutation({
     onSuccess: () => {
-      utils.row.getByTableId.invalidate({ tableId: activeTableId });
+      utils.row.getByTableId.invalidate({
+        tableId: activeTableId,
+      });
     },
   });
-
-  const handleAddRows = () => {
-    bulkSeedMutation.mutate({ tableId: activeTableId, count: 100000 });
-  };
 
   const { data: tableData, isLoading: tableLoading } =
     api.table.getById.useQuery(
@@ -54,9 +53,13 @@ export default function BaseClient({ user, base, onSignOut }: BaseClientProps) {
   // intitial fetch (smaller batches now)
   const { data: rowsData, isLoading: rowsLoading } =
     api.row.getByTableId.useQuery(
-      { tableId: activeTableId, limit: 100, offset: 0 },
+      { tableId: activeTableId, limit: 100, offset: 0, searchTerm: searchTerm },
       { enabled: !!activeTableId },
     );
+
+  const handleAddRows = () => {
+    bulkSeedMutation.mutate({ tableId: activeTableId, count: 100000 });
+  };
 
   // intialise allRows when data loads
   useEffect(() => {
@@ -75,6 +78,7 @@ export default function BaseClient({ user, base, onSignOut }: BaseClientProps) {
         tableId: activeTableId,
         limit: 100,
         offset: allRows.length, // start where we left off
+        searchTerm: searchTerm,
       });
 
       setAllRows((prev) => [...prev, ...result.rows]); // append new rows
@@ -95,6 +99,25 @@ export default function BaseClient({ user, base, onSignOut }: BaseClientProps) {
     );
   };
 
+  const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setDebouncedSearchTerm(e.target.value);
+  };
+
+  // debounce search term
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setSearchTerm(debouncedSearchTerm);
+    }, 500);
+
+    return () => clearTimeout(timer);
+  }, [debouncedSearchTerm]);
+
+  // reset rows when search term changes
+  useEffect(() => {
+    setAllRows([]);
+    setTotalRows(0);
+  }, [searchTerm]);
+
   return (
     <div className="flex h-screen">
       <CollapsedSidebar user={user} onSignOut={onSignOut} />
@@ -113,6 +136,8 @@ export default function BaseClient({ user, base, onSignOut }: BaseClientProps) {
             onToggleSidebar={() => setSidebarOpen(!sidebarOpen)}
             onAddRows={handleAddRows}
             isLoading={bulkSeedMutation.isPending}
+            onSearch={handleSearch}
+            searchTerm={debouncedSearchTerm}
           />
 
           <div className="flex flex-1 overflow-hidden">
