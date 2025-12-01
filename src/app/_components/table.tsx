@@ -264,17 +264,14 @@ export default function Table({
           })}
         </tbody>
 
-        <tfoot
-          style={{ display: "block" }}
-          className="border-t border-gray-200"
-        >
+        <tfoot style={{ display: "block" }}>
           <tr
             onClick={handleAddRow}
             style={{ display: "flex" }}
-            className="group cursor-pointer hover:bg-gray-50"
+            className="group cursor-pointer border-b border-gray-200 hover:bg-gray-50"
           >
             <td
-              className="border-b border-gray-200 px-3 py-2.5 text-sm text-gray-400"
+              className="px-3 py-2.5 text-sm text-gray-400"
               style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}
             >
               <Plus size={16} className="text-gray-400" />
