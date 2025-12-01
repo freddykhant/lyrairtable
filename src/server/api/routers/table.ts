@@ -1,10 +1,9 @@
 import { z } from "zod";
 import { eq, and, asc } from "drizzle-orm";
-import { bases, tables, columns, rows } from "~/server/db/schema";
+import { bases, tables, columns, rows, views } from "~/server/db/schema";
 import { faker } from "@faker-js/faker";
 
 import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
-import { createTextSpan } from "typescript";
 
 export const tableRouter = createTRPCRouter({
   // create new table
@@ -36,6 +35,24 @@ export const tableRouter = createTRPCRouter({
 
       if (!newTable) {
         throw new Error("Failed to create table");
+      }
+
+      // create default view
+      const [defaultView] = await ctx.db
+        .insert(views)
+        .values({
+          name: "Default View",
+          tableId: newTable.id,
+          config: {
+            filters: [],
+            sorts: [],
+            hiddenColumns: [],
+          },
+        })
+        .returning();
+
+      if (!defaultView) {
+        throw new Error("Failed to create default view");
       }
 
       // define default columns

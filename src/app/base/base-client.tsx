@@ -213,6 +213,17 @@ export default function BaseClient({ user, base, onSignOut }: BaseClientProps) {
     return () => clearTimeout(timer);
   }, [debouncedSearchTerm]);
 
+  // auto-select first view when table changes
+  useEffect(() => {
+    if (viewsData && viewsData.length > 0) {
+      // if current activeViewId doesn't belong to this table's views, reset it
+      const viewExists = viewsData.some((v) => v.id === activeViewId);
+      if (!viewExists) {
+        setActiveViewId(viewsData[0]?.id ?? null);
+      }
+    }
+  }, [viewsData, activeViewId]);
+
   return (
     <div className="flex h-screen">
       <CollapsedSidebar user={user} onSignOut={onSignOut} />

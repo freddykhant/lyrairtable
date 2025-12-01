@@ -2,7 +2,7 @@ import { z } from "zod";
 import { eq, desc } from "drizzle-orm";
 
 import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
-import { bases, tables, columns, rows } from "~/server/db/schema";
+import { bases, tables, columns, rows, views } from "~/server/db/schema";
 import { faker } from "@faker-js/faker";
 
 export const baseRouter = createTRPCRouter({
@@ -32,6 +32,24 @@ export const baseRouter = createTRPCRouter({
           order: 0,
         })
         .returning();
+
+      // create default view
+      const [defaultView] = await ctx.db
+        .insert(views)
+        .values({
+          name: "Default View",
+          tableId: newTable?.id ?? "",
+          config: {
+            filters: [],
+            sorts: [],
+            hiddenColumns: [],
+          },
+        })
+        .returning();
+
+      if (!defaultView) {
+        throw new Error("Failed to create default view");
+      }
 
       // create default columns
       const defaultColumns = [
