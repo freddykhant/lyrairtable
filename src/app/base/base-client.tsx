@@ -112,12 +112,6 @@ export default function BaseClient({ user, base, onSignOut }: BaseClientProps) {
     return () => clearTimeout(timer);
   }, [debouncedSearchTerm]);
 
-  // reset rows when search term changes
-  useEffect(() => {
-    setAllRows([]);
-    setTotalRows(0);
-  }, [searchTerm]);
-
   return (
     <div className="flex h-screen">
       <CollapsedSidebar user={user} onSignOut={onSignOut} />
