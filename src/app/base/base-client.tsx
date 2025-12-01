@@ -10,6 +10,26 @@ import { useState, useEffect } from "react";
 import Table from "../_components/table";
 import { api } from "~/trpc/react";
 
+type ViewConfig = {
+  filters?: Array<{
+    columnId: string;
+    operator:
+      | "contains"
+      | "notContains"
+      | "equals"
+      | "isEmpty"
+      | "isNotEmpty"
+      | "greaterThan"
+      | "lessThan";
+    value?: string;
+  }>;
+  sorts?: Array<{
+    columnId: string;
+    direction: "asc" | "desc";
+  }>;
+  hiddenColumns?: string[];
+};
+
 const EMPTY_COLUMNS: (typeof columns.$inferSelect)[] = [];
 
 interface BaseClientProps {
@@ -51,6 +71,12 @@ export default function BaseClient({ user, base, onSignOut }: BaseClientProps) {
       { enabled: !!activeTableId },
     );
 
+  // get active view config
+  const activeView = viewsData?.find((view) => view.id === activeViewId);
+  const viewConfig = activeView?.config as ViewConfig | undefined;
+  const viewFilters = viewConfig?.filters ?? [];
+  const viewSorts = viewConfig?.sorts ?? [];
+
   const { data: tableData, isLoading: tableLoading } =
     api.table.getById.useQuery(
       { id: activeTableId, baseId: base.id },
@@ -60,7 +86,14 @@ export default function BaseClient({ user, base, onSignOut }: BaseClientProps) {
   // intitial fetch (smaller batches now)
   const { data: rowsData, isLoading: rowsLoading } =
     api.row.getByTableId.useQuery(
-      { tableId: activeTableId, limit: 100, offset: 0, searchTerm: searchTerm },
+      {
+        tableId: activeTableId,
+        limit: 100,
+        offset: 0,
+        searchTerm: searchTerm,
+        filters: viewFilters,
+        sorts: viewSorts,
+      },
       { enabled: !!activeTableId },
     );
 
@@ -86,6 +119,8 @@ export default function BaseClient({ user, base, onSignOut }: BaseClientProps) {
         limit: 100,
         offset: allRows.length, // start where we left off
         searchTerm: searchTerm,
+        filters: viewFilters,
+        sorts: viewSorts,
       });
 
       setAllRows((prev) => [...prev, ...result.rows]); // append new rows
