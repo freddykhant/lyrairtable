@@ -164,4 +164,24 @@ export const tableRouter = createTRPCRouter({
 
       return updatedTable;
     }),
+
+  // delete table
+  delete: protectedProcedure
+    .input(z.object({ id: z.string() }))
+    .mutation(async ({ ctx, input }) => {
+      const table = await ctx.db.query.tables.findFirst({
+        where: eq(tables.id, input.id),
+        with: {
+          base: true,
+        },
+      });
+
+      if (!table || table.base.userId !== ctx.session.user.id) {
+        throw new Error("Table not found");
+      }
+
+      await ctx.db.delete(tables).where(eq(tables.id, input.id));
+
+      return { success: true };
+    }),
 });
