@@ -54,6 +54,7 @@ export default function BaseClient({ user, base, onSignOut }: BaseClientProps) {
   const [debouncedSearchTerm, setDebouncedSearchTerm] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
   const [activeViewId, setActiveViewId] = useState<string | null>(null);
+  const [hideColumnsOpen, setHideColumnsOpen] = useState(false);
 
   const utils = api.useUtils();
 
@@ -180,10 +181,11 @@ export default function BaseClient({ user, base, onSignOut }: BaseClientProps) {
             isLoading={bulkSeedMutation.isPending}
             onSearch={handleSearch}
             searchTerm={debouncedSearchTerm}
-            columns={tableData?.columns ?? EMPTY_COLUMNS}
+            columns={visibleColumns}
             hiddenColumns={viewHiddenColumns}
             activeViewId={activeViewId ?? ""}
             tableId={activeTableId}
+            onToggleHideColumns={() => setHideColumnsOpen(!hideColumnsOpen)}
           />
 
           <div className="flex flex-1 overflow-hidden">
