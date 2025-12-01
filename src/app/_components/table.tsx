@@ -6,10 +6,10 @@ import {
   flexRender,
 } from "@tanstack/react-table";
 import { useVirtualizer } from "@tanstack/react-virtual";
-import { useMemo, useState, useRef, useEffect } from "react";
+import { useMemo, useRef, useEffect } from "react";
 import type { columns, rows } from "~/server/db/schema";
-import { api } from "~/trpc/react";
 import { Plus } from "lucide-react";
+import { useTableHandlers } from "./useTableHandlers";
 
 interface TableProps {
   tableId: string;
@@ -30,38 +30,23 @@ export default function Table({
   onFetchMore,
   onRowUpdate,
 }: TableProps) {
-  const [editingCell, setEditingCell] = useState<{
-    rowId: string;
-    columnId: string;
-  } | null>(null);
-  const [editedValue, setEditedValue] = useState<string>("");
-
-  const [selectedCell, setSelectedCell] = useState<{
-    rowIndex: number;
-    columnIndex: number;
-  } | null>(null);
-
   // ref for scrollable container
   const parentRef = useRef<HTMLDivElement>(null);
 
-  const utils = api.useUtils();
-
-  const createRow = api.row.create.useMutation({
-    onSuccess: () => {
-      utils.row.getByTableId.invalidate({ tableId });
-    },
-  });
-
-  const updateRow = api.row.update.useMutation({
-    // no cache invalidation needed - we're just updating local state
-    // the parent component's `allRows` will naturally show the updated value
-  });
-
-  const createColumn = api.column.create.useMutation({
-    onSuccess: () => {
-      utils.table.getById.invalidate();
-    },
-  });
+  // custom hook for all handlers and state
+  const {
+    editingCell,
+    editedValue,
+    selectedCell,
+    setEditedValue,
+    setSelectedCell,
+    handleAddRow,
+    handleCellClick,
+    handleSave,
+    handleCancel,
+    handleAddColumn,
+    handleKeyDown,
+  } = useTableHandlers({ tableId, columns, rows, onRowUpdate });
 
   const tanstackColumns = useMemo(
     () =>
@@ -162,119 +147,6 @@ export default function Table({
   if (!columns.length) {
     return <div className="p-4 text-gray-500"> No columns found</div>;
   }
-
-  // row handlers
-  const handleAddRow = () => {
-    const emptyData: Record<string, string> = {};
-    columns.forEach((col) => {
-      emptyData[col.id] = "";
-    });
-
-    createRow.mutate({
-      tableId: tableId,
-      data: emptyData,
-      order: rows.length,
-    });
-  };
-
-  // cell handlers
-  const handleCellClick = (
-    rowId: string,
-    columnId: string,
-    currentValue: string,
-  ) => {
-    setEditingCell({ rowId, columnId });
-    setEditedValue(currentValue || "");
-  };
-
-  const handleSave = (rowId: string) => {
-    if (!editingCell) return;
-
-    // find the original row data
-    const originalRow = rows.find((r) => r.id === rowId);
-    if (!originalRow) return;
-
-    // merge the edited value into the row's JSONB data
-    const updatedData = {
-      ...(originalRow.data as Record<string, string>),
-      [editingCell.columnId]: editedValue,
-    };
-
-    // update parent state immediately (optimistic update)
-    onRowUpdate(rowId, updatedData);
-
-    // save to database
-    updateRow.mutate({
-      id: rowId,
-      data: updatedData,
-    });
-
-    setEditingCell(null);
-  };
-
-  const handleCancel = () => {
-    setEditingCell(null);
-    setEditedValue("");
-  };
-
-  // column handlers
-  const handleAddColumn = () => {
-    createColumn.mutate({
-      tableId: tableId,
-      name: "New Column",
-      type: "text",
-      order: columns.length,
-    });
-  };
-
-  // keyboard navigation handler
-  const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (!selectedCell) return;
-
-    const { rowIndex, columnIndex } = selectedCell;
-    const maxRowIndex = rows.length - 1;
-    const maxColIndex = columns.length - 1;
-
-    let newRowIndex = rowIndex;
-    let newColIndex = columnIndex;
-
-    switch (e.key) {
-      case "ArrowUp":
-        e.preventDefault();
-        newRowIndex = Math.max(0, rowIndex - 1);
-        break;
-      case "ArrowDown":
-        e.preventDefault();
-        newRowIndex = Math.min(maxRowIndex, rowIndex + 1);
-        break;
-      case "ArrowLeft":
-        e.preventDefault();
-        newColIndex = Math.max(0, columnIndex - 1);
-        break;
-      case "ArrowRight":
-      case "Tab":
-        e.preventDefault();
-        newColIndex = Math.min(maxColIndex, columnIndex + 1);
-        break;
-      case "Enter":
-        e.preventDefault();
-        // start editing the selected cell
-        const row = rows[rowIndex];
-        const column = columns[columnIndex];
-        if (row && column) {
-          handleCellClick(
-            row.id,
-            column.id,
-            (row.data as Record<string, string>)[column.id] || "",
-          );
-        }
-        break;
-      default:
-        return;
-    }
-
-    setSelectedCell({ rowIndex: newRowIndex, columnIndex: newColIndex });
-  };
 
   return (
     <div
