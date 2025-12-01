@@ -4,6 +4,7 @@ import { columnRouter } from "~/server/api/routers/column";
 import { rowRouter } from "~/server/api/routers/row";
 import { createCallerFactory, createTRPCRouter } from "~/server/api/trpc";
 import { bulkRouter } from "~/server/api/routers/bulk";
+import { viewRouter } from "~/server/api/routers/view";
 
 /**
  * This is the primary router for your server.
@@ -16,6 +17,7 @@ export const appRouter = createTRPCRouter({
   column: columnRouter,
   row: rowRouter,
   bulk: bulkRouter,
+  view: viewRouter,
 });
 
 // export type definition of API
