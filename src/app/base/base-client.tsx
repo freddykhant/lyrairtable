@@ -85,9 +85,9 @@ export default function BaseClient({ user, base, onSignOut }: BaseClientProps) {
 
   // hidden columns
   const viewHiddenColumns = viewConfig?.hiddenColumns ?? [];
-  const visibleColumns =
-    tableData?.columns.filter((col) => !viewHiddenColumns.includes(col.id)) ??
-    EMPTY_COLUMNS;
+  const visibleColumns = (tableData?.columns ?? EMPTY_COLUMNS).filter(
+    (col) => !viewHiddenColumns.includes(col.id),
+  );
 
   // intitial fetch (smaller batches now)
   const { data: rowsData, isLoading: rowsLoading } =
@@ -198,7 +198,7 @@ export default function BaseClient({ user, base, onSignOut }: BaseClientProps) {
             <div className="flex-1 overflow-auto bg-white text-sm">
               <Table
                 tableId={activeTableId}
-                columns={tableData?.columns ?? EMPTY_COLUMNS}
+                columns={visibleColumns}
                 rows={allRows}
                 totalRows={totalRows}
                 isLoading={tableLoading || rowsLoading}
