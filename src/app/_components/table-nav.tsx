@@ -28,6 +28,10 @@ export default function TableNav({
   const utils = api.useUtils();
 
   const createTable = api.table.create.useMutation({
+    onSuccess: () => {
+      utils.base.getById.invalidate({ id: baseId });
+      router.refresh();
+    },
     onError: (error) => {
       console.error(error);
     },
@@ -35,14 +39,13 @@ export default function TableNav({
 
   const updateTable = api.table.update.useMutation({
     onSuccess: () => {
-      utils.base.getById.invalidate();
+      utils.base.getById.invalidate({ id: baseId });
     },
   });
 
   // table handlers
   const handleAddTable = async () => {
-    await createTable.mutate({ name: "Untitled Table", baseId });
-    router.refresh();
+    createTable.mutate({ name: "Untitled Table", baseId });
   };
 
   const handleTableClick = (tableId: string, currentName: string) => {
@@ -109,11 +112,12 @@ export default function TableNav({
           );
         })}
         <button
-          className="flex items-center gap-2 rounded-md px-3 py-1.5 font-medium text-gray-600 hover:bg-gray-100"
+          className="flex items-center gap-2 rounded-md px-3 py-1.5 font-medium text-gray-600 hover:bg-gray-100 disabled:opacity-50"
           onClick={() => handleAddTable()}
+          disabled={createTable.isPending}
         >
           <Plus size={14} />
-          <span>Add</span>
+          <span>{createTable.isPending ? "Adding..." : "Add"}</span>
         </button>
       </div>
     </nav>
