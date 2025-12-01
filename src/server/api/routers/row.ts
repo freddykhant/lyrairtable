@@ -46,6 +46,31 @@ export const rowRouter = createTRPCRouter({
         limit: z.number().min(1).max(1000).default(50),
         offset: z.number().min(0).default(0),
         searchTerm: z.string().optional(),
+        filters: z
+          .array(
+            z.object({
+              columnId: z.string(),
+              operator: z.enum([
+                "contains",
+                "notContains",
+                "equals",
+                "isEmpty",
+                "isNotEmpty",
+                "greaterThan",
+                "lessThan",
+              ]),
+              value: z.string().optional(),
+            }),
+          )
+          .optional(),
+        sorts: z
+          .array(
+            z.object({
+              columnId: z.string(),
+              direction: z.enum(["asc", "desc"]),
+            }),
+          )
+          .optional(),
       }),
     )
     .query(async ({ ctx, input }) => {
@@ -67,6 +92,44 @@ export const rowRouter = createTRPCRouter({
         whereClause = sql`${rows.tableId} = ${input.tableId} AND ${rows.data}::text ILIKE ${`%${input.searchTerm}%`}`;
       }
 
+      // apply filters
+      if (input.filters && input.filters.length > 0) {
+        const filterConditions = input.filters.map((filter) => {
+          const { columnId, operator, value } = filter;
+
+          switch (operator) {
+            case "contains":
+              return sql`${rows.data}->>${columnId} ILIKE ${`%${value}%`}`;
+            case "notContains":
+              return sql`${rows.data}->>${columnId} NOT ILIKE ${`%${value}%`}`;
+            case "equals":
+              return sql`${rows.data}->>${columnId} = ${value}`;
+            case "isEmpty":
+              return sql`(${rows.data}->>${columnId} IS NULL OR ${rows.data}->>${columnId} = '')`;
+            case "isNotEmpty":
+              return sql`(${rows.data}->>${columnId} IS NOT NULL AND ${rows.data}->>${columnId} != '')`;
+            case "greaterThan":
+              return sql`(${rows.data}->>${columnId})::numeric > ${value}`;
+            case "lessThan":
+              return sql`(${rows.data}->>${columnId})::numeric < ${value}`;
+            default:
+              return sql`true`;
+          }
+        });
+
+        // combine w existing where clause
+        whereClause = sql`${whereClause} AND ${sql.join(filterConditions, sql` AND `)}`;
+      }
+
+      const orderByClause =
+        input.sorts && input.sorts.length > 0
+          ? input.sorts.map((sort) =>
+              sort.direction === "asc"
+                ? sql`${rows.data}->>${sort.columnId} ASC`
+                : sql`${rows.data}->>${sort.columnId} DESC`,
+            )
+          : [asc(rows.order)]; // default to order field
+
       // fetch rows
       const tableRows = await ctx.db
         .select()
@@ -74,7 +137,7 @@ export const rowRouter = createTRPCRouter({
         .where(whereClause)
         .limit(input.limit)
         .offset(input.offset)
-        .orderBy(asc(rows.order));
+        .orderBy(...orderByClause);
 
       // get total count with same filter
       const [{ count } = { count: 0 }] = await ctx.db
