@@ -1,6 +1,6 @@
 "use client";
 
-import { Loader2, Menu, Plus } from "lucide-react";
+import { Loader2, Menu, Plus, EyeOff } from "lucide-react";
 import type { columns } from "~/server/db/schema";
 
 interface TableHeaderProps {
@@ -13,6 +13,7 @@ interface TableHeaderProps {
   hiddenColumns: string[];
   activeViewId: string;
   tableId: string;
+  onToggleHideColumns: () => void;
 }
 
 export default function TableHeader({
@@ -25,6 +26,7 @@ export default function TableHeader({
   hiddenColumns,
   activeViewId,
   tableId,
+  onToggleHideColumns,
 }: TableHeaderProps) {
   return (
     <header className="flex items-center justify-between border-b border-gray-200 bg-white px-4 py-2">
@@ -42,6 +44,16 @@ export default function TableHeader({
           onChange={onSearch}
           className="w-48 rounded-lg border border-gray-300 px-3 py-1.5 text-sm focus:ring-2 focus:ring-blue-500"
         />
+
+        {/* hide columns button */}
+        <button
+          onClick={onToggleHideColumns}
+          className="flex items-center gap-2 rounded-lg border border-gray-300 px-3 py-1.5 text-sm text-gray-700 hover:bg-gray-50"
+        >
+          <EyeOff size={16} />
+          <span>Hide columns</span>
+        </button>
+
         {isLoading ? (
           <div className="flex items-center justify-center gap-2">
             <Loader2 size={20} className="animate-spin text-gray-600" />
