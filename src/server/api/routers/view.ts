@@ -59,4 +59,47 @@ export const viewRouter = createTRPCRouter({
 
       return newView;
     }),
+
+  // update view
+  update: protectedProcedure
+    .input(
+      z.object({
+        id: z.string(),
+        name: z.string().optional(),
+        config: z
+          .object({
+            filters: z.array(z.any()).optional(),
+            sorts: z.array(z.any()).optional(),
+            hiddenColumns: z.array(z.string()).optional(),
+          })
+          .optional(),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      const view = await ctx.db.query.views.findFirst({
+        where: eq(views.id, input.id),
+        with: {
+          table: {
+            with: {
+              base: true,
+            },
+          },
+        },
+      });
+
+      if (!view || view.table.base.userId !== ctx.session.user.id) {
+        throw new Error("View not found");
+      }
+
+      const [updatedView] = await ctx.db
+        .update(views)
+        .set({
+          ...(input.name && { name: input.name }),
+          ...(input.config && { config: input.config }),
+        })
+        .where(eq(views.id, input.id))
+        .returning();
+
+      return updatedView;
+    }),
 });
