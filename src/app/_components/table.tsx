@@ -137,7 +137,7 @@ export default function Table({
   const rowVirtualizer = useVirtualizer({
     count: totalRows, // total rows in db
     getScrollElement: () => parentRef.current, // scrollable container
-    estimateSize: () => 35, // estimated row heightin px
+    estimateSize: () => 35, // cell size = 35px
     overscan: 10, // render 10 extra rows above/below viewport
   });
 
@@ -278,7 +278,7 @@ export default function Table({
 
   return (
     <div
-      ref={parentRef}
+      ref={parentRef} // scrollable container
       className="h-full w-full overflow-auto outline-none"
       onKeyDown={handleKeyDown}
       tabIndex={0}
@@ -325,6 +325,7 @@ export default function Table({
           ))}
         </thead>
 
+        {/* virtualised tbody */}
         <tbody
           style={{
             display: "block",
