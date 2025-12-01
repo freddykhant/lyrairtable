@@ -33,6 +33,7 @@ export default function BaseClient({ user, base, onSignOut }: BaseClientProps) {
   const [totalRows, setTotalRows] = useState(0); // total rows count
   const [debouncedSearchTerm, setDebouncedSearchTerm] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
+  const [activeViewId, setActiveViewId] = useState<string | null>(null);
 
   const utils = api.useUtils();
 
@@ -43,6 +44,12 @@ export default function BaseClient({ user, base, onSignOut }: BaseClientProps) {
       });
     },
   });
+
+  const { data: viewsData, isLoading: viewsLoading } =
+    api.view.getByTableId.useQuery(
+      { tableId: activeTableId },
+      { enabled: !!activeTableId },
+    );
 
   const { data: tableData, isLoading: tableLoading } =
     api.table.getById.useQuery(
@@ -135,7 +142,14 @@ export default function BaseClient({ user, base, onSignOut }: BaseClientProps) {
           />
 
           <div className="flex flex-1 overflow-hidden">
-            <TableSidebar isOpen={sidebarOpen} />
+            <TableSidebar
+              isOpen={sidebarOpen}
+              views={viewsData ?? []}
+              viewsLoading={viewsLoading}
+              activeViewId={activeViewId}
+              onViewChange={setActiveViewId}
+              tableId={activeTableId}
+            />
             <div className="flex-1 overflow-auto bg-white text-sm">
               <Table
                 tableId={activeTableId}
