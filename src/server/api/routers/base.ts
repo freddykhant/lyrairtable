@@ -102,10 +102,35 @@ export const baseRouter = createTRPCRouter({
   update: protectedProcedure
     .input(z.object({ id: z.string(), name: z.string().min(1) }))
     .mutation(async ({ ctx, input }) => {
+      const base = await ctx.db.query.bases.findFirst({
+        where: eq(bases.id, input.id),
+      });
+
+      if (!base || base.userId !== ctx.session.user.id) {
+        throw new Error("Base not found");
+      }
+
       return await ctx.db
         .update(bases)
         .set({ name: input.name })
         .where(eq(bases.id, input.id))
         .returning();
+    }),
+
+  // delete base
+  delete: protectedProcedure
+    .input(z.object({ id: z.string() }))
+    .mutation(async ({ ctx, input }) => {
+      const base = await ctx.db.query.bases.findFirst({
+        where: eq(bases.id, input.id),
+      });
+
+      if (!base || base.userId !== ctx.session.user.id) {
+        throw new Error("Base not found");
+      }
+
+      await ctx.db.delete(bases).where(eq(bases.id, input.id));
+
+      return { success: true };
     }),
 });
