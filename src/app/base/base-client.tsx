@@ -72,6 +72,12 @@ export default function BaseClient({ user, base, onSignOut }: BaseClientProps) {
       { enabled: !!activeTableId },
     );
 
+  const updateView = api.view.update.useMutation({
+    onSuccess: () => {
+      utils.view.getByTableId.invalidate({ tableId: activeTableId });
+    },
+  });
+
   // get active view config
   const activeView = viewsData?.find((view) => view.id === activeViewId);
   const viewConfig = activeView?.config as ViewConfig | undefined;
@@ -152,6 +158,52 @@ export default function BaseClient({ user, base, onSignOut }: BaseClientProps) {
     setDebouncedSearchTerm(e.target.value);
   };
 
+  // column visibility handlers
+  const handleToggleColumn = (columnId: string) => {
+    if (!activeViewId) return;
+
+    const newHiddenColumns = viewHiddenColumns.includes(columnId)
+      ? viewHiddenColumns.filter((id) => id !== columnId) // show
+      : [...viewHiddenColumns, columnId]; // hide
+
+    updateView.mutate({
+      id: activeViewId,
+      config: {
+        filters: viewFilters,
+        sorts: viewSorts,
+        hiddenColumns: newHiddenColumns,
+      },
+    });
+  };
+
+  const handleHideAll = () => {
+    if (!activeViewId) return;
+
+    const allColumnIds = (tableData?.columns ?? []).map((col) => col.id);
+
+    updateView.mutate({
+      id: activeViewId,
+      config: {
+        filters: viewFilters,
+        sorts: viewSorts,
+        hiddenColumns: allColumnIds,
+      },
+    });
+  };
+
+  const handleShowAll = () => {
+    if (!activeViewId) return;
+
+    updateView.mutate({
+      id: activeViewId,
+      config: {
+        filters: viewFilters,
+        sorts: viewSorts,
+        hiddenColumns: [],
+      },
+    });
+  };
+
   // debounce search term
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -181,11 +233,13 @@ export default function BaseClient({ user, base, onSignOut }: BaseClientProps) {
             isLoading={bulkSeedMutation.isPending}
             onSearch={handleSearch}
             searchTerm={debouncedSearchTerm}
-            columns={visibleColumns}
+            columns={tableData?.columns ?? EMPTY_COLUMNS}
             hiddenColumns={viewHiddenColumns}
-            activeViewId={activeViewId ?? ""}
-            tableId={activeTableId}
             onToggleHideColumns={() => setHideColumnsOpen(!hideColumnsOpen)}
+            hideColumnsOpen={hideColumnsOpen}
+            onToggleColumn={handleToggleColumn}
+            onHideAll={handleHideAll}
+            onShowAll={handleShowAll}
           />
 
           <div className="flex flex-1 overflow-hidden">
