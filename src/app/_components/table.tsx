@@ -46,6 +46,8 @@ export default function Table({
     handleCancel,
     handleAddColumn,
     handleKeyDown,
+    toggleColumnDropdown,
+    columnDropdownOpen,
   } = useTableHandlers({ tableId, columns, rows, onRowUpdate });
 
   const tanstackColumns = useMemo(
@@ -183,15 +185,42 @@ export default function Table({
                 </th>
               ))}
               <th
-                className="border-gray-200 px-4 py-2"
+                className="relative border-gray-200 px-4 py-2"
                 style={{ display: "block" }}
               >
                 <button
-                  onClick={handleAddColumn}
-                  className="flex items-center gap-1 text-xs text-gray-600 hover:text-gray-900"
+                  onClick={toggleColumnDropdown}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" || e.key === " ") {
+                      e.preventDefault();
+                      toggleColumnDropdown();
+                    } else if (e.key === "Escape") {
+                      e.stopPropagation();
+                      toggleColumnDropdown();
+                    }
+                  }}
+                  className="flex items-center gap-1 text-xs text-gray-600 hover:cursor-pointer hover:text-gray-900"
                 >
                   <Plus size={14} />
                 </button>
+
+                {/* dropdown */}
+                {columnDropdownOpen && (
+                  <div className="absolute top-full right-0 z-50 mt-1 w-32 rounded-lg border border-gray-200 bg-white shadow-lg">
+                    <button
+                      onClick={() => handleAddColumn("text")}
+                      className="w-full cursor-pointer px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-50"
+                    >
+                      Text
+                    </button>
+                    <button
+                      onClick={() => handleAddColumn("number")}
+                      className="w-full cursor-pointer px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-50"
+                    >
+                      Number
+                    </button>
+                  </div>
+                )}
               </th>
             </tr>
           ))}

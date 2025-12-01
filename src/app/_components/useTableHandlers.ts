@@ -15,7 +15,6 @@ export function useTableHandlers({
   rows,
   onRowUpdate,
 }: UseTableHandlersProps) {
-  // ===== STATE =====
   const [editingCell, setEditingCell] = useState<{
     rowId: string;
     columnId: string;
@@ -25,8 +24,8 @@ export function useTableHandlers({
     rowIndex: number;
     columnIndex: number;
   } | null>(null);
+  const [columnDropdownOpen, setColumnDropdownOpen] = useState(false);
 
-  // ===== MUTATIONS =====
   const utils = api.useUtils();
 
   const createRow = api.row.create.useMutation({
@@ -44,8 +43,6 @@ export function useTableHandlers({
       utils.table.getById.invalidate();
     },
   });
-
-  // ===== HANDLERS =====
 
   // row handlers
   const handleAddRow = () => {
@@ -100,13 +97,18 @@ export function useTableHandlers({
   };
 
   // column handlers
-  const handleAddColumn = () => {
+  const handleAddColumn = (type: "text" | "number") => {
     createColumn.mutate({
       tableId: tableId,
-      name: "New Column",
-      type: "text",
+      name: type === "text" ? "Text" : "Number",
+      type: type,
       order: columns.length,
     });
+    setColumnDropdownOpen(false);
+  };
+
+  const toggleColumnDropdown = () => {
+    setColumnDropdownOpen(!columnDropdownOpen);
   };
 
   // keyboard navigation
@@ -171,6 +173,7 @@ export function useTableHandlers({
     handleCancel,
     handleAddColumn,
     handleKeyDown,
+    toggleColumnDropdown,
+    columnDropdownOpen,
   };
 }
-
