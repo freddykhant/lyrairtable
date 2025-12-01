@@ -83,6 +83,12 @@ export default function BaseClient({ user, base, onSignOut }: BaseClientProps) {
       { enabled: !!activeTableId && !!base.id },
     );
 
+  // hidden columns
+  const viewHiddenColumns = viewConfig?.hiddenColumns ?? [];
+  const visibleColumns =
+    tableData?.columns.filter((col) => !viewHiddenColumns.includes(col.id)) ??
+    EMPTY_COLUMNS;
+
   // intitial fetch (smaller batches now)
   const { data: rowsData, isLoading: rowsLoading } =
     api.row.getByTableId.useQuery(
@@ -174,6 +180,10 @@ export default function BaseClient({ user, base, onSignOut }: BaseClientProps) {
             isLoading={bulkSeedMutation.isPending}
             onSearch={handleSearch}
             searchTerm={debouncedSearchTerm}
+            columns={tableData?.columns ?? EMPTY_COLUMNS}
+            hiddenColumns={viewHiddenColumns}
+            activeViewId={activeViewId ?? ""}
+            tableId={activeTableId}
           />
 
           <div className="flex flex-1 overflow-hidden">

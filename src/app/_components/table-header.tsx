@@ -1,6 +1,7 @@
 "use client";
 
 import { Loader2, Menu, Plus } from "lucide-react";
+import type { columns } from "~/server/db/schema";
 
 interface TableHeaderProps {
   onToggleSidebar: () => void;
@@ -8,6 +9,10 @@ interface TableHeaderProps {
   isLoading: boolean;
   onSearch: (e: React.ChangeEvent<HTMLInputElement>) => void;
   searchTerm: string;
+  columns: (typeof columns.$inferSelect)[];
+  hiddenColumns: string[];
+  activeViewId: string;
+  tableId: string;
 }
 
 export default function TableHeader({
@@ -16,6 +21,10 @@ export default function TableHeader({
   isLoading,
   onSearch,
   searchTerm,
+  columns,
+  hiddenColumns,
+  activeViewId,
+  tableId,
 }: TableHeaderProps) {
   return (
     <header className="flex items-center justify-between border-b border-gray-200 bg-white px-4 py-2">
