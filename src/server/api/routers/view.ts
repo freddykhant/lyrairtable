@@ -23,4 +23,40 @@ export const viewRouter = createTRPCRouter({
         where: eq(views.tableId, input.tableId),
       });
     }),
+
+  // create view
+  create: protectedProcedure
+    .input(
+      z.object({
+        name: z.string().min(1),
+        tableId: z.string(),
+        config: z.object({
+          filters: z.array(z.any()).optional(),
+          sorts: z.array(z.any()).optional(),
+        }),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      const table = await ctx.db.query.tables.findFirst({
+        where: eq(tables.id, input.tableId),
+        with: {
+          base: true,
+        },
+      });
+
+      if (!table || table.base.userId !== ctx.session.user.id) {
+        throw new Error("Table not found");
+      }
+
+      const [newView] = await ctx.db
+        .insert(views)
+        .values({
+          name: input.name,
+          tableId: input.tableId,
+          config: input.config,
+        })
+        .returning();
+
+      return newView;
+    }),
 });
