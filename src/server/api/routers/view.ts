@@ -102,4 +102,31 @@ export const viewRouter = createTRPCRouter({
 
       return updatedView;
     }),
+
+  // delete view
+  delete: protectedProcedure
+    .input(z.object({ id: z.string() }))
+    .mutation(async ({ ctx, input }) => {
+      const view = await ctx.db.query.views.findFirst({
+        where: eq(views.id, input.id),
+        with: {
+          table: {
+            with: {
+              base: true,
+            },
+          },
+        },
+      });
+
+      if (!view || view.table.base.userId !== ctx.session.user.id) {
+        throw new Error("View not found");
+      }
+
+      const [deletedView] = await ctx.db
+        .delete(views)
+        .where(eq(views.id, input.id))
+        .returning();
+
+      return deletedView;
+    }),
 });
