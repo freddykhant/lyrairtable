@@ -8,7 +8,12 @@ import {
 import { useVirtualizer } from "@tanstack/react-virtual";
 import { useMemo, useRef, useEffect } from "react";
 import type { columns, rows } from "~/server/db/schema";
-import { ChevronDown, Plus } from "lucide-react";
+import {
+  ChevronDown,
+  Plus,
+  ArrowUpWideNarrow,
+  ArrowDownNarrowWide,
+} from "lucide-react";
 import { useTableHandlers } from "./useTableHandlers";
 
 interface TableProps {
@@ -225,7 +230,10 @@ export default function Table({
                         }}
                         className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:cursor-pointer hover:bg-gray-50"
                       >
-                        Sort A→Z
+                        <div className="flex items-center gap-2">
+                          <ArrowUpWideNarrow size={14} />{" "}
+                          <span>Sort A → Z</span>
+                        </div>
                       </button>
                       <button
                         onClick={() => {
@@ -233,7 +241,10 @@ export default function Table({
                         }}
                         className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:cursor-pointer hover:bg-gray-50"
                       >
-                        Sort Z→A
+                        <div className="flex items-center gap-2">
+                          <ArrowDownNarrowWide size={14} />{" "}
+                          <span>Sort Z → A</span>
+                        </div>
                       </button>
                     </div>
                   )}
