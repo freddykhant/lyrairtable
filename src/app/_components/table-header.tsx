@@ -28,6 +28,7 @@ interface TableHeaderProps {
   activeTableId: string;
   currentSorts: Array<{ columnId: string; direction: "asc" | "desc" }>;
   onUpdateSort: (columnId: string, direction: "asc" | "desc") => void;
+  onClearSort: () => void;
 }
 
 export default function TableHeader({
@@ -46,6 +47,7 @@ export default function TableHeader({
   activeTableId,
   currentSorts,
   onUpdateSort,
+  onClearSort,
 }: TableHeaderProps) {
   const [sortModalOpen, setSortModalOpen] = useState(false);
   const [selectedSortColumn, setSelectedSortColumn] = useState<string | null>(
@@ -60,7 +62,7 @@ export default function TableHeader({
   const isSorting = selectedSortColumn !== null;
 
   return (
-    <header className="flex items-center justify-between border-b border-gray-200 bg-white px-4 py-2">
+    <header className="flex items-center justify-between border-b border-gray-200 bg-white px-4 py-1">
       {/* sidebar toggle button */}
       <button
         onClick={onToggleSidebar}
@@ -68,7 +70,7 @@ export default function TableHeader({
       >
         <Menu size={20} />
       </button>
-      <div className="relative flex items-center gap-2">
+      <div className="relative flex items-center gap-4">
         {/* hide fields modal */}
         {hideColumnsOpen && (
           <div className="absolute top-full right-4 z-50 mt-2 w-80 rounded-lg border border-gray-200 bg-white shadow-lg">
@@ -146,10 +148,10 @@ export default function TableHeader({
               setSelectedDirection("asc");
             }
           }}
-          className="flex items-center gap-2 rounded-lg px-3 py-1.5 text-sm text-gray-500 hover:cursor-pointer hover:bg-gray-50"
+          className="flex items-center gap-2 rounded-sm text-sm text-gray-500 hover:cursor-pointer hover:bg-gray-50"
         >
           {currentSorts.length > 0 ? (
-            <span className="rounded-sm bg-orange-100 px-2 py-0.5 text-sm text-orange-700">
+            <span className="rounded-sm bg-orange-100 px-3 py-1.5 text-sm text-orange-700 hover:cursor-pointer">
               <div className="flex items-center gap-2">
                 <ArrowUpDown size={16} />
                 <span>
@@ -271,6 +273,8 @@ export default function TableHeader({
                   <div className="flex items-center justify-center">
                     <button
                       onClick={() => {
+                        onClearSort();
+                        setSortModalOpen(false);
                         setSelectedSortColumn(null);
                       }}
                       className="text-sm font-medium text-gray-500 hover:cursor-pointer hover:bg-gray-100"

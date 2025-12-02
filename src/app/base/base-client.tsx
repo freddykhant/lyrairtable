@@ -249,6 +249,20 @@ export default function BaseClient({ user, base, onSignOut }: BaseClientProps) {
     });
   };
 
+  // handle clear sort
+  const handleClearSort = () => {
+    if (!activeViewId) return;
+
+    updateView.mutate({
+      id: activeViewId,
+      config: {
+        filters: viewFilters,
+        sorts: [], // clear sorts
+        hiddenColumns: viewHiddenColumns,
+      },
+    });
+  };
+
   return (
     <div className="flex h-screen">
       <CollapsedSidebar user={user} onSignOut={onSignOut} />
@@ -279,6 +293,7 @@ export default function BaseClient({ user, base, onSignOut }: BaseClientProps) {
             activeTableId={activeTableId}
             currentSorts={viewSorts}
             onUpdateSort={handleUpdateSort}
+            onClearSort={handleClearSort}
           />
 
           <div className="flex flex-1 overflow-hidden">
