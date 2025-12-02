@@ -232,7 +232,7 @@ export default function BaseClient({ user, base, onSignOut }: BaseClientProps) {
     }
   }, [viewsData, activeViewId]);
 
-  // update sort
+  // update view config with new sort
   const handleUpdateSort = (columnId: string, direction: "asc" | "desc") => {
     if (!activeViewId) return;
 
