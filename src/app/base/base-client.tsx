@@ -276,6 +276,9 @@ export default function BaseClient({ user, base, onSignOut }: BaseClientProps) {
             onToggleColumn={handleToggleColumn}
             onHideAll={handleHideAll}
             onShowAll={handleShowAll}
+            activeTableId={activeTableId}
+            currentSorts={viewSorts}
+            onUpdateSort={handleUpdateSort}
           />
 
           <div className="flex flex-1 overflow-hidden">
