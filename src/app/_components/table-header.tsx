@@ -242,7 +242,9 @@ export default function TableHeader({
                         }}
                         className="flex w-full items-center justify-between rounded-lg border border-gray-300 px-3 py-2 text-sm hover:bg-gray-50"
                       >
-                        <span>A → Z</span>
+                        <span>
+                          {selectedDirection === "asc" ? "A → Z" : "Z → A"}
+                        </span>
                         <ChevronDown size={14} />
                       </button>
 
