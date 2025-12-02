@@ -19,6 +19,9 @@ interface TableProps {
   isLoading: boolean;
   onFetchMore: () => void;
   onRowUpdate: (rowId: string, updatedData: Record<string, string>) => void;
+  activeViewId: string;
+  currentSorts: Array<{ columnId: string; direction: "asc" | "desc" }>;
+  onUpdateSort: (columnId: string, direction: "asc" | "desc") => void;
 }
 
 export default function Table({
@@ -29,6 +32,9 @@ export default function Table({
   isLoading,
   onFetchMore,
   onRowUpdate,
+  activeViewId,
+  currentSorts,
+  onUpdateSort,
 }: TableProps) {
   // ref for scrollable container
   const parentRef = useRef<HTMLDivElement>(null);
@@ -50,7 +56,16 @@ export default function Table({
     addColumnDropdownOpen,
     sortDropdownColumn,
     setSortDropdownColumn,
-  } = useTableHandlers({ tableId, columns, rows, onRowUpdate });
+    handleSort,
+  } = useTableHandlers({
+    tableId,
+    columns,
+    rows,
+    onRowUpdate,
+    activeViewId,
+    currentSorts,
+    onUpdateSort,
+  });
 
   const tanstackColumns = useMemo(
     () =>
@@ -201,12 +216,12 @@ export default function Table({
                     </button>
                   </div>
 
-                  {/* sort dropdown */}
+                  {/* sort column dropdown */}
                   {sortDropdownColumn === header.id && (
                     <div className="absolute top-full left-0 z-50 mt-1 w-48 rounded-lg border border-gray-200 bg-white shadow-lg hover:cursor-pointer">
                       <button
                         onClick={() => {
-                          setSortDropdownColumn(null);
+                          handleSort(header.id, "asc");
                         }}
                         className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:cursor-pointer hover:bg-gray-50"
                       >
@@ -214,7 +229,7 @@ export default function Table({
                       </button>
                       <button
                         onClick={() => {
-                          setSortDropdownColumn(null);
+                          handleSort(header.id, "desc");
                         }}
                         className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:cursor-pointer hover:bg-gray-50"
                       >
@@ -244,7 +259,7 @@ export default function Table({
                   <Plus size={14} />
                 </button>
 
-                {/* dropdown */}
+                {/* add column dropdown */}
                 {addColumnDropdownOpen ? (
                   <div className="absolute top-full right-0 z-50 mt-1 w-32 rounded-lg border border-gray-200 bg-white shadow-lg">
                     <button

@@ -7,6 +7,9 @@ interface UseTableHandlersProps {
   columns: (typeof columns.$inferSelect)[];
   rows: (typeof rows.$inferSelect)[];
   onRowUpdate: (rowId: string, updatedData: Record<string, string>) => void;
+  activeViewId: string;
+  currentSorts: Array<{ columnId: string; direction: "asc" | "desc" }>;
+  onUpdateSort: (columnId: string, direction: "asc" | "desc") => void;
 }
 
 export function useTableHandlers({
@@ -14,6 +17,8 @@ export function useTableHandlers({
   columns,
   rows,
   onRowUpdate,
+  activeViewId,
+  onUpdateSort,
 }: UseTableHandlersProps) {
   const [editingCell, setEditingCell] = useState<{
     rowId: string;
@@ -110,11 +115,20 @@ export function useTableHandlers({
     setAddColumnDropdownOpen(false);
   };
 
+  // sort handler
+  const handleSort = (columnId: string, direction: "asc" | "desc") => {
+    if (!activeViewId) return;
+
+    onUpdateSort(columnId, direction);
+    setSortDropdownColumn(null); // close dropdown
+  };
+
+  // toggle column dropdown
   const toggleColumnDropdown = () => {
     setAddColumnDropdownOpen(!addColumnDropdownOpen);
   };
 
-  // keyboard navigation
+  // handle keyboard navigation
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (!selectedCell) return;
 
@@ -180,5 +194,6 @@ export function useTableHandlers({
     addColumnDropdownOpen,
     sortDropdownColumn,
     setSortDropdownColumn,
+    handleSort,
   };
 }

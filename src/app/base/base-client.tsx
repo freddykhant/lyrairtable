@@ -58,6 +58,7 @@ export default function BaseClient({ user, base, onSignOut }: BaseClientProps) {
 
   const utils = api.useUtils();
 
+  // bulk seed rows
   const bulkSeedMutation = api.bulk.seedRows.useMutation({
     onSuccess: () => {
       utils.row.getByTableId.invalidate({
@@ -66,12 +67,14 @@ export default function BaseClient({ user, base, onSignOut }: BaseClientProps) {
     },
   });
 
+  // get views for this table
   const { data: viewsData, isLoading: viewsLoading } =
     api.view.getByTableId.useQuery(
       { tableId: activeTableId },
       { enabled: !!activeTableId },
     );
 
+  // update view
   const updateView = api.view.update.useMutation({
     onSuccess: () => {
       utils.view.getByTableId.invalidate({ tableId: activeTableId });
@@ -84,6 +87,7 @@ export default function BaseClient({ user, base, onSignOut }: BaseClientProps) {
   const viewFilters = viewConfig?.filters ?? [];
   const viewSorts = viewConfig?.sorts ?? [];
 
+  // get table data
   const { data: tableData, isLoading: tableLoading } =
     api.table.getById.useQuery(
       { id: activeTableId, baseId: base.id },
@@ -110,6 +114,7 @@ export default function BaseClient({ user, base, onSignOut }: BaseClientProps) {
       { enabled: !!activeTableId },
     );
 
+  // add rows
   const handleAddRows = () => {
     bulkSeedMutation.mutate({ tableId: activeTableId, count: 100000 });
   };
@@ -154,11 +159,12 @@ export default function BaseClient({ user, base, onSignOut }: BaseClientProps) {
     );
   };
 
+  // search
   const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
     setDebouncedSearchTerm(e.target.value);
   };
 
-  // column visibility handlers
+  // toggle column visibility
   const handleToggleColumn = (columnId: string) => {
     if (!activeViewId) return;
 
@@ -176,6 +182,7 @@ export default function BaseClient({ user, base, onSignOut }: BaseClientProps) {
     });
   };
 
+  // hide all columns
   const handleHideAll = () => {
     if (!activeViewId) return;
 
@@ -191,6 +198,7 @@ export default function BaseClient({ user, base, onSignOut }: BaseClientProps) {
     });
   };
 
+  // show all columns
   const handleShowAll = () => {
     if (!activeViewId) return;
 
@@ -223,6 +231,23 @@ export default function BaseClient({ user, base, onSignOut }: BaseClientProps) {
       }
     }
   }, [viewsData, activeViewId]);
+
+  // update sort
+  const handleUpdateSort = (columnId: string, direction: "asc" | "desc") => {
+    if (!activeViewId) return;
+
+    // replace or add sort for this column
+    const newSorts = [{ columnId, direction }];
+
+    updateView.mutate({
+      id: activeViewId,
+      config: {
+        filters: viewFilters,
+        sorts: newSorts,
+        hiddenColumns: viewHiddenColumns,
+      },
+    });
+  };
 
   return (
     <div className="flex h-screen">
@@ -271,6 +296,9 @@ export default function BaseClient({ user, base, onSignOut }: BaseClientProps) {
                 isLoading={tableLoading || rowsLoading}
                 onFetchMore={fetchMoreRows}
                 onRowUpdate={handleRowUpdate}
+                activeViewId={activeViewId ?? ""}
+                currentSorts={viewSorts}
+                onUpdateSort={handleUpdateSort}
               />
             </div>
           </div>
