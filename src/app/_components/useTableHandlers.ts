@@ -24,7 +24,10 @@ export function useTableHandlers({
     rowIndex: number;
     columnIndex: number;
   } | null>(null);
-  const [columnDropdownOpen, setColumnDropdownOpen] = useState(false);
+  const [addColumnDropdownOpen, setAddColumnDropdownOpen] = useState(false);
+  const [sortDropdownColumn, setSortDropdownColumn] = useState<string | null>(
+    null,
+  );
 
   const utils = api.useUtils();
 
@@ -104,11 +107,11 @@ export function useTableHandlers({
       type: type,
       order: columns.length,
     });
-    setColumnDropdownOpen(false);
+    setAddColumnDropdownOpen(false);
   };
 
   const toggleColumnDropdown = () => {
-    setColumnDropdownOpen(!columnDropdownOpen);
+    setAddColumnDropdownOpen(!addColumnDropdownOpen);
   };
 
   // keyboard navigation
@@ -174,6 +177,8 @@ export function useTableHandlers({
     handleAddColumn,
     handleKeyDown,
     toggleColumnDropdown,
-    columnDropdownOpen,
+    addColumnDropdownOpen,
+    sortDropdownColumn,
+    setSortDropdownColumn,
   };
 }

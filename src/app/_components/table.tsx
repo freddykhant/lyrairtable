@@ -8,7 +8,7 @@ import {
 import { useVirtualizer } from "@tanstack/react-virtual";
 import { useMemo, useRef, useEffect } from "react";
 import type { columns, rows } from "~/server/db/schema";
-import { Plus } from "lucide-react";
+import { ChevronDown, Plus } from "lucide-react";
 import { useTableHandlers } from "./useTableHandlers";
 
 interface TableProps {
@@ -47,7 +47,9 @@ export default function Table({
     handleAddColumn,
     handleKeyDown,
     toggleColumnDropdown,
-    columnDropdownOpen,
+    addColumnDropdownOpen,
+    sortDropdownColumn,
+    setSortDropdownColumn,
   } = useTableHandlers({ tableId, columns, rows, onRowUpdate });
 
   const tanstackColumns = useMemo(
@@ -178,9 +180,47 @@ export default function Table({
                   }}
                   className="border-r border-gray-200 px-4 py-2 text-left text-xs font-medium text-gray-700"
                 >
-                  {flexRender(
-                    header.column.columnDef.header,
-                    header.getContext(),
+                  <div className="flex items-center justify-between">
+                    <span>
+                      {flexRender(
+                        header.column.columnDef.header,
+                        header.getContext(),
+                      )}
+                    </span>
+
+                    {/* sort button */}
+                    <button
+                      onClick={() =>
+                        setSortDropdownColumn(
+                          sortDropdownColumn === header.id ? null : header.id,
+                        )
+                      }
+                      className="ml-2 text-gray-400 hover:cursor-pointer hover:text-gray-600"
+                    >
+                      <ChevronDown size={14} />
+                    </button>
+                  </div>
+
+                  {/* sort dropdown */}
+                  {sortDropdownColumn === header.id && (
+                    <div className="absolute top-full left-0 z-50 mt-1 w-48 rounded-lg border border-gray-200 bg-white shadow-lg hover:cursor-pointer">
+                      <button
+                        onClick={() => {
+                          setSortDropdownColumn(null);
+                        }}
+                        className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:cursor-pointer hover:bg-gray-50"
+                      >
+                        Sort A→Z
+                      </button>
+                      <button
+                        onClick={() => {
+                          setSortDropdownColumn(null);
+                        }}
+                        className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:cursor-pointer hover:bg-gray-50"
+                      >
+                        Sort Z→A
+                      </button>
+                    </div>
                   )}
                 </th>
               ))}
@@ -205,7 +245,7 @@ export default function Table({
                 </button>
 
                 {/* dropdown */}
-                {columnDropdownOpen && (
+                {addColumnDropdownOpen ? (
                   <div className="absolute top-full right-0 z-50 mt-1 w-32 rounded-lg border border-gray-200 bg-white shadow-lg">
                     <button
                       onClick={() => handleAddColumn("text")}
@@ -220,7 +260,7 @@ export default function Table({
                       Number
                     </button>
                   </div>
-                )}
+                ) : null}
               </th>
             </tr>
           ))}
