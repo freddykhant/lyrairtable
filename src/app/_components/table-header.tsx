@@ -135,7 +135,17 @@ export default function TableHeader({
 
         {/* sort button */}
         <button
-          onClick={() => setSortModalOpen(!sortModalOpen)}
+          onClick={() => {
+            setSortModalOpen(!sortModalOpen);
+            // if sorts exist, load them into state
+            if (currentSorts.length > 0) {
+              setSelectedSortColumn(currentSorts[0]?.columnId ?? null);
+              setSelectedDirection(currentSorts[0]?.direction ?? "asc");
+            } else {
+              setSelectedSortColumn(null);
+              setSelectedDirection("asc");
+            }
+          }}
           className="flex items-center gap-2 rounded-lg px-3 py-1.5 text-sm text-gray-500 hover:cursor-pointer hover:bg-gray-50"
         >
           {currentSorts.length > 0 ? (
@@ -190,7 +200,7 @@ export default function TableHeader({
                     <div className="relative">
                       <button
                         onClick={() => {
-                          // toggle column dropdown
+                          setColumnDropdownOpen(!columnDropdownOpen);
                         }}
                         className="flex w-full items-center justify-between rounded-lg border border-gray-300 px-3 py-2 text-sm hover:bg-gray-50"
                       >
@@ -202,6 +212,23 @@ export default function TableHeader({
                         </span>
                         <ChevronDown size={14} />
                       </button>
+
+                      {columnDropdownOpen && (
+                        <div className="absolute top-full left-0 z-50 mt-1 max-h-48 w-full overflow-y-auto rounded-lg border border-gray-200 bg-white shadow-lg">
+                          {columns.map((column) => (
+                            <button
+                              key={column.id}
+                              onClick={() => {
+                                setSelectedSortColumn(column.id);
+                                setColumnDropdownOpen(false);
+                              }}
+                              className="flex w-full items-center px-3 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                            >
+                              {column.name}
+                            </button>
+                          ))}
+                        </div>
+                      )}
                     </div>
                   </div>
                   {/* direction selector */}
@@ -209,13 +236,36 @@ export default function TableHeader({
                     <div className="relative">
                       <button
                         onClick={() => {
-                          // toggle direction dropdown
+                          setDirectionDropdownOpen(!directionDropdownOpen);
                         }}
                         className="flex w-full items-center justify-between rounded-lg border border-gray-300 px-3 py-2 text-sm hover:bg-gray-50"
                       >
                         <span>A → Z</span>
                         <ChevronDown size={14} />
                       </button>
+
+                      {directionDropdownOpen && (
+                        <div className="absolute top-full left-0 z-50 mt-1 w-full rounded-lg border border-gray-200 bg-white shadow-lg">
+                          <button
+                            onClick={() => {
+                              setSelectedDirection("asc");
+                              setDirectionDropdownOpen(false);
+                            }}
+                            className="flex w-full items-center px-3 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                          >
+                            A → Z
+                          </button>
+                          <button
+                            onClick={() => {
+                              setSelectedDirection("desc");
+                              setDirectionDropdownOpen(false);
+                            }}
+                            className="flex w-full items-center px-3 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                          >
+                            Z → A
+                          </button>
+                        </div>
+                      )}
                     </div>
                   </div>
                   <div className="flex items-center justify-center">
@@ -241,13 +291,14 @@ export default function TableHeader({
                   >
                     Cancel
                   </button>
-                  {/* sort button */}
+                  {/* apply sort button */}
                   <button
                     onClick={() => {
                       if (selectedSortColumn) {
-                        onUpdateSort(selectedSortColumn, "asc");
+                        onUpdateSort(selectedSortColumn, selectedDirection);
                         setSortModalOpen(false);
                         setSelectedSortColumn(null);
+                        setSelectedDirection("asc");
                       }
                     }}
                     className="rounded-lg bg-blue-600 px-2 py-1 text-sm font-medium text-white hover:bg-blue-700"
