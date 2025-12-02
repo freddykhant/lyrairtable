@@ -1,39 +1,56 @@
-# lyrairtable clone
+# Airtable Clone
 
-building lyra airtable clone as part of my take home assessment with lyra
+A full-featured spreadsheet application built to handle 100k+ rows with smooth performance.
 
-## req
+## Features
 
-- [ ] 1:1 UI with airtable
-- [x] able to log in via google and create bases
-- [x] in each base, able to create tables
-- [x] able to dynamically add columns
-- [x] text and number (fine for now)
-- [x] editing cells, navigable with arrow keys + tab key
-- [x] creating table will show default rows + columns
-- [x] ability to see table w/ 100k rows and scroll **WITHOUT LAG**
-- [x] button to add 100k rows to table
-- [x] virtualised infinite scroll using tRPC's hooks + tanstack virtualiser
-- [x] ability to search across all cells (filter for rows)
-- [x] able to create a 'view' of a table and save following configurations:
-- [ ] filter columns: for both numbers (greater than, smaller than) adn text (not empty, is empty, contains, not contains, equal to)
-- [ ] simple sorting on columns: text A->Z, Z->A
-- [ ] for numbers, decreasing or increasing
-- [x] search, filter, sort have to be done on db level
-- [x] can search through and hide/show columns
-- [ ] make sure theres a loading state
-- [ ] ultimate goal: if there are **1m rows**, can still **load without issue**!
+- **Google Authentication** - secure login via NextAuth
+- **Bases & Tables** - create and organize your data
+- **Dynamic Columns** - add text and number columns on the fly
+- **Cell Editing** - inline editing with keyboard navigation (arrow keys + tab)
+- **Views System** - save configurations per view:
+  - Column visibility (hide/show)
+  - Sorting (A→Z, Z→A, 1→9, 9→1)
+  - Filtering (contains, equals, greater than, etc.)
+- **Virtualized Scrolling** - render 100k+ rows without lag
+- **Database-Level Operations** - search, filter, and sort execute on PostgreSQL
 
-## tech stack
+## Tech Stack
 
-t3 stack
+| Layer          | Technology              |
+| -------------- | ----------------------- |
+| Framework      | Next.js 15 (App Router) |
+| Auth           | NextAuth (Google)       |
+| API            | tRPC                    |
+| Database       | PostgreSQL (Neon)       |
+| ORM            | Drizzle                 |
+| Styling        | Tailwind CSS            |
+| Table          | TanStack Table          |
+| Virtualization | TanStack Virtual        |
+| Mock Data      | Faker.js                |
 
-- next app router
-- next auth (google)
-- tailwind
-- trpc
-- drizzle
-- postgres neon
-- tanstack table
-- tan stack virtualizer
-- fakerjs
+## Getting Started
+
+```bash
+# install dependencies
+pnpm install
+
+# set up environment variables
+cp .env.example .env
+
+# push database schema
+pnpm db:push
+
+# run development server
+pnpm dev
+```
+
+## Environment Variables
+
+```env
+DATABASE_URL=
+NEXTAUTH_SECRET=
+NEXTAUTH_URL=
+GOOGLE_CLIENT_ID=
+GOOGLE_CLIENT_SECRET=
+```

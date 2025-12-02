@@ -7,7 +7,7 @@ import { sql } from "drizzle-orm";
 config({ path: ".env" });
 
 // Recreate the table creator
-const createTable = pgTableCreator((name) => `lyrairtable_${name}`);
+const createTable = pgTableCreator((name) => `airtable_${name}`);
 
 // Define minimal table structures (just need the names)
 const views = createTable("view", (d) => ({
@@ -58,7 +58,9 @@ async function clearDatabase() {
     await db.delete(bases);
 
     console.log("\n✅ Database cleared successfully!");
-    console.log("Your user account is still intact - you can log in and start fresh.");
+    console.log(
+      "Your user account is still intact - you can log in and start fresh.",
+    );
   } catch (error) {
     console.error("❌ Error clearing database:", error);
     process.exit(1);
@@ -74,4 +76,3 @@ clearDatabase()
   .finally(() => {
     process.exit(0);
   });
-

@@ -8,5 +8,5 @@ export default {
   dbCredentials: {
     url: env.STORAGE_DATABASE_URL,
   },
-  tablesFilter: ["lyrairtable_*"],
+  tablesFilter: ["airtable_*"],
 } satisfies Config;
