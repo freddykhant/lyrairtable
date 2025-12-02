@@ -51,6 +51,11 @@ export default function TableHeader({
   const [selectedSortColumn, setSelectedSortColumn] = useState<string | null>(
     null,
   );
+  const [columnDropdownOpen, setColumnDropdownOpen] = useState(false);
+  const [directionDropdownOpen, setDirectionDropdownOpen] = useState(false);
+  const [selectedDirection, setSelectedDirection] = useState<"asc" | "desc">(
+    "asc",
+  );
 
   const isSorting = selectedSortColumn !== null;
 
