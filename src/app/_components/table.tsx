@@ -178,7 +178,7 @@ export default function Table({
                     minWidth: header.getSize(),
                     display: "block",
                   }}
-                  className="border-r border-gray-200 px-4 py-2 text-left text-xs font-medium text-gray-700"
+                  className="relative border-r border-gray-200 px-4 py-2 text-left text-xs font-medium text-gray-700"
                 >
                   <div className="flex items-center justify-between">
                     <span>
