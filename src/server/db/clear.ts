@@ -7,7 +7,7 @@ import { sql } from "drizzle-orm";
 config({ path: ".env" });
 
 // Recreate the table creator
-const createTable = pgTableCreator((name) => `airtable_${name}`);
+const createTable = pgTableCreator((name) => `airtablesque_${name}`);
 
 // Define minimal table structures (just need the names)
 const views = createTable("view", (d) => ({
@@ -33,7 +33,7 @@ const bases = createTable("base", (d) => ({
 // Note: We don't delete from auth tables (users, accounts, sessions)
 // to preserve your Google OAuth login
 
-const sqlClient = neon(process.env.STORAGE_POSTGRES_URL!);
+const sqlClient = neon(process.env.STORAGE_DATABASE_URL!);
 const db = drizzle({ client: sqlClient });
 
 async function clearDatabase() {

@@ -8,5 +8,5 @@ export default {
   dbCredentials: {
     url: env.STORAGE_DATABASE_URL,
   },
-  tablesFilter: ["airtable_*"],
+  tablesFilter: ["airtablesque_*"],
 } satisfies Config;

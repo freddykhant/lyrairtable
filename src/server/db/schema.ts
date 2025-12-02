@@ -9,7 +9,7 @@ import { type AdapterAccount } from "next-auth/adapters";
  *
  * @see https://orm.drizzle.team/docs/goodies#multi-project-schema
  */
-export const createTable = pgTableCreator((name) => `airtable_${name}`);
+export const createTable = pgTableCreator((name) => `airtablesque_${name}`);
 
 export const bases = createTable(
   "base",

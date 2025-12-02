@@ -29,7 +29,7 @@ export function Header({ onMenuClick, user, onSignOut }: HeaderProps) {
         {/* Logo */}
         <div className="flex items-center gap-2">
           <Image src="/airtable.svg" alt="airtable" width={24} height={24} />
-          <span className="text-lg font-bold text-gray-800">airtable</span>
+          <span className="text-lg font-bold text-gray-800">airtablesque</span>
         </div>
       </div>
 

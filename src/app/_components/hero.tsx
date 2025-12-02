@@ -16,7 +16,9 @@ export default async function Hero() {
         <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4">
           <div className="flex items-center gap-2">
             <Image src="/airtable.svg" alt="airtable" width={24} height={24} />
-            <span className="text-lg font-bold text-gray-800">airtable</span>
+            <span className="text-lg font-bold text-gray-800">
+              airtablesque
+            </span>
           </div>
           <form
             action={async () => {

@@ -1,4 +1,4 @@
-# Airtable Clone
+# Airtablesque
 
 A full-featured spreadsheet application built to handle 100k+ rows with smooth performance.
 
@@ -48,9 +48,8 @@ pnpm dev
 ## Environment Variables
 
 ```env
-DATABASE_URL=
-NEXTAUTH_SECRET=
-NEXTAUTH_URL=
-GOOGLE_CLIENT_ID=
-GOOGLE_CLIENT_SECRET=
+STORAGE_DATABASE_URL=        # Neon PostgreSQL connection string
+AUTH_SECRET=                 # NextAuth secret (run: npx auth secret)
+AUTH_GOOGLE_ID=              # Google OAuth client ID
+AUTH_GOOGLE_SECRET=          # Google OAuth client secret
 ```
