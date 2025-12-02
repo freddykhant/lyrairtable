@@ -43,7 +43,7 @@ export default async function Hero() {
           <h1 className="mb-6 text-6xl leading-tight font-bold text-gray-900">
             <br />
             <span className="bg-linear-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-              airtable clone
+              airtablesque
             </span>
           </h1>
 
