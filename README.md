@@ -1,8 +1,8 @@
-# Airtablesque
+# airtablesque
 
-A full-featured spreadsheet application built to handle 100k+ rows with smooth performance.
+a full-featured spreadsheet application built to handle 100k+ rows with smooth performance.
 
-## Features
+## features
 
 - **Google Authentication** - secure login via NextAuth
 - **Bases & Tables** - create and organize your data
@@ -15,7 +15,7 @@ A full-featured spreadsheet application built to handle 100k+ rows with smooth p
 - **Virtualized Scrolling** - render 100k+ rows without lag
 - **Database-Level Operations** - search, filter, and sort execute on PostgreSQL
 
-## Tech Stack
+## tech stack
 
 | Layer          | Technology              |
 | -------------- | ----------------------- |
@@ -29,7 +29,7 @@ A full-featured spreadsheet application built to handle 100k+ rows with smooth p
 | Virtualization | TanStack Virtual        |
 | Mock Data      | Faker.js                |
 
-## Getting Started
+## getting Started
 
 ```bash
 # install dependencies
@@ -45,7 +45,7 @@ pnpm db:push
 pnpm dev
 ```
 
-## Environment Variables
+## environment Variables
 
 ```env
 STORAGE_DATABASE_URL=        # Neon PostgreSQL connection string
